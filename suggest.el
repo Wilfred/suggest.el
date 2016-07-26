@@ -66,9 +66,25 @@ These functions must not produce side effects.")
         (loop-continue))
       ;; Stop once we reach the outputs.
       (when (equal it suggest--outputs-heading)
-        (loop-break))
-      (push it raw-inputs))
-    (nreverse raw-inputs)))
+        (loop-return (nreverse raw-inputs)))
+      (push it raw-inputs))))
+
+;; TODO: check that there's only one line of output, or prevent
+;; multiple lines being entered.
+(defun suggest--raw-output ()
+  "Read the output line in the current suggestion buffer."
+  (let ((seen-output-header nil))
+    (loop-for-each-line
+      ;; Skip empty lines.
+      (when (equal it "")
+        (loop-continue))
+      ;; Note when we've seen the output header.
+      (when (equal it suggest--outputs-heading)
+        (setq seen-output-header t)
+        (loop-continue))
+      ;; The line after the output header is what we want.
+      (when seen-output-header
+        (loop-return it)))))
 
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
