@@ -46,6 +46,7 @@ These functions must not produce side effects.")
   "Face for headings."
   :group 'suggest)
 
+;; TODO: 'arguments' is probably clearer than 'inputs'.
 (defvar suggest--inputs-heading "Inputs (one per line):")
 (defvar suggest--outputs-heading "Desired output:")
 (defvar suggest--results-heading "Suggestions:")
