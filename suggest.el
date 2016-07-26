@@ -48,11 +48,11 @@ These functions must not produce side effects.")
 (defvar suggest--outputs-heading "Desired output:")
 (defvar suggest--results-heading "Suggestions:")
 
-;; TODO: make headings read-only (see
-;; http://stackoverflow.com/a/7415021/509706).
 (defun suggest--heading (text)
   "Format TEXT as a heading."
-  (propertize text 'face 'suggest-heading))
+  (propertize text
+              'face 'suggest-heading
+              'read-only t))
 
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
@@ -62,12 +62,13 @@ and outputs given."
     (switch-to-buffer buf)
     (erase-buffer)
     (suggest-mode)
-    (insert (suggest--heading suggest--inputs-heading)
-            "\nnil\n\n"
-            (suggest--heading suggest--outputs-heading)
-            "\nnil\n\n"
-            (suggest--heading suggest--results-heading)
-            "\n(identity nil) ;=> nil")))
+    (let ((inhibit-read-only t))
+      (insert (suggest--heading suggest--inputs-heading)
+              "\nnil\n\n"
+              (suggest--heading suggest--outputs-heading)
+              "\nnil\n\n"
+              (suggest--heading suggest--results-heading)
+              "\n(identity nil) ;=> nil"))))
 
 (define-derived-mode suggest-mode fundamental-mode "Suggest"
   "A major mode for finding functions that provide the output requested.")
