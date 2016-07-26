@@ -52,7 +52,12 @@ and outputs given."
     (switch-to-buffer buf)
     (erase-buffer)
     (suggest-mode)
-    (insert (propertize "hello world" 'face 'suggest-heading))))
+    (insert (propertize "Inputs (one per line):" 'face 'suggest-heading)
+            "\nnil\n\n"
+            (propertize "Desired output:" 'face 'suggest-heading)
+            "\nnil\n\n"
+            (propertize "Suggestions:" 'face 'suggest-heading)
+            "\n(identity nil) ;=> nil")))
 
 (define-derived-mode suggest-mode fundamental-mode "Suggest"
   "A major mode for finding functions that provide the output requested.")
