@@ -5,6 +5,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.1
 ;; Keywords: convenience
+;; Package-Requires: ((loop "1.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -54,6 +55,20 @@ These functions must not produce side effects.")
   (propertize text
               'face 'suggest-heading
               'read-only t))
+
+(defun suggest--raw-inputs ()
+  "Read the input lines in the current suggestion buffer."
+  (let ((raw-inputs nil))
+    (loop-for-each-line
+      ;; Skip over the inputs heading or lines without any content.
+      (when (or (equal it suggest--inputs-heading)
+                (equal it ""))
+        (loop-continue))
+      ;; Stop once we reach the outputs.
+      (when (equal it suggest--outputs-heading)
+        (loop-break))
+      (push it raw-inputs))
+    (nreverse raw-inputs)))
 
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
