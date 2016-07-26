@@ -44,6 +44,10 @@ These functions must not produce side effects.")
   "Face for headings."
   :group 'suggest)
 
+(defvar suggest--inputs-heading "Inputs (one per line):")
+(defvar suggest--outputs-heading "Desired output:")
+(defvar suggest--results-heading "Suggestions:")
+
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
 and outputs given."
@@ -52,11 +56,11 @@ and outputs given."
     (switch-to-buffer buf)
     (erase-buffer)
     (suggest-mode)
-    (insert (propertize "Inputs (one per line):" 'face 'suggest-heading)
+    (insert (propertize suggest--inputs-heading 'face 'suggest-heading)
             "\nnil\n\n"
-            (propertize "Desired output:" 'face 'suggest-heading)
+            (propertize suggest--outputs-heading 'face 'suggest-heading)
             "\nnil\n\n"
-            (propertize "Suggestions:" 'face 'suggest-heading)
+            (propertize suggest--results-heading 'face 'suggest-heading)
             "\n(identity nil) ;=> nil")))
 
 (define-derived-mode suggest-mode fundamental-mode "Suggest"
