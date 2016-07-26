@@ -38,6 +38,7 @@
     cdr
     cadr
     cons
+    nth
     ;; Arithmetic
     +
     -
