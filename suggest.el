@@ -103,8 +103,40 @@ and outputs given."
               (suggest--heading suggest--results-heading)
               "\n(identity nil) ;=> nil"))))
 
+(defun suggest--write-suggestions (suggestions output)
+  "Write SUGGESTIONS to the current *suggest* buffer.
+SUGGESTIONS is a list of forms."
+  (save-excursion
+    (goto-char (point-min))
+    ;; Move to the first line of the results.
+    (while (not (looking-at suggest--results-heading))
+      (forward-line 1))
+    (forward-line 1)
+    ;; Remove the current suggestions.
+    (delete-region (point) (point-max))
+    ;; Insert all the suggestions given.
+    (--each suggestions
+      (insert (format "%s" it))
+      (insert
+       (propertize
+        (format " ;=> %s\n" output)
+        'face 'font-lock-comment-face)))))
+
+(defun suggest-update ()
+  "Update the suggestions according to the latest inputs/output given."
+  (interactive)
+  (let* ((inputs (-map #'eval (suggest--raw-inputs)))
+         (output (eval (suggest--raw-output))))
+    (suggest--write-suggestions
+     '((foo 1 2) (bar 3 4))
+     output)))
+
 (define-derived-mode suggest-mode fundamental-mode "Suggest"
   "A major mode for finding functions that provide the output requested.")
+
+;; TODO: Pick one of these, both is silly
+(define-key suggest-mode-map (kbd "<C-return>") #'suggest-update)
+(define-key suggest-mode-map (kbd "C-c C-c") #'suggest-update)
 
 (provide 'suggest)
 ;;; suggest.el ends here
