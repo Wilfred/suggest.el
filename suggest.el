@@ -37,6 +37,7 @@
     car
     cdr
     cadr
+    caddr
     cons
     nth
     ;; Arithmetic
