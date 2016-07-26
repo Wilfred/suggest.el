@@ -138,7 +138,8 @@ SUGGESTIONS is a list of forms."
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
   (let* ((inputs (--map (eval (read it)) (suggest--raw-inputs)))
-         (desired-output (eval (read (suggest--raw-output))))
+         (raw-output (suggest--raw-output))
+         (desired-output (eval (read raw-output)))
          (suggestions nil))
     (--each suggest-functions
       (ignore-errors
@@ -146,7 +147,7 @@ SUGGESTIONS is a list of forms."
           (when (equal func-output desired-output)
             (push (-concat (list it) inputs) suggestions)))))
     (if suggestions
-        (suggest--write-suggestions suggestions desired-output)
+        (suggest--write-suggestions suggestions raw-output)
       ;; TODO: write this in the buffer instead.
       (user-error "No matches found"))))
 
