@@ -5,7 +5,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.1
 ;; Keywords: convenience
-;; Package-Requires: ((loop "1.3"))
+;; Package-Requires: ((loop "1.3") (dash "2.12.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 ;; a great way of exploring list, string and arithmetic functions.
 
 ;;; Code:
+
+(require 'dash)
 
 ;; TODO: support arbitrary orderings of arguments?
 (defvar suggest-functions
@@ -125,11 +127,18 @@ SUGGESTIONS is a list of forms."
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
-  (let* ((inputs (-map #'eval (suggest--raw-inputs)))
-         (output (eval (suggest--raw-output))))
-    (suggest--write-suggestions
-     '((foo 1 2) (bar 3 4))
-     output)))
+  (let* ((inputs (--map (eval (read it)) (suggest--raw-inputs)))
+         (desired-output (eval (read (suggest--raw-output))))
+         (suggestions nil))
+    (--each suggest-functions
+      (ignore-errors
+        (let ((func-output (apply it inputs)))
+          (when (equal func-output desired-output)
+            (push (-concat (list it) inputs) suggestions)))))
+    (if suggestions
+        (suggest--write-suggestions suggestions desired-output)
+      ;; TODO: write this in the buffer instead.
+      (user-error "No matches found"))))
 
 (define-derived-mode suggest-mode fundamental-mode "Suggest"
   "A major mode for finding functions that provide the output requested.")
