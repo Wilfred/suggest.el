@@ -147,7 +147,7 @@ SUGGESTIONS is a list of forms."
           (when (equal func-output desired-output)
             (push (-concat (list it) inputs) suggestions)))))
     (if suggestions
-        (suggest--write-suggestions suggestions raw-output)
+        (suggest--write-suggestions (nreverse suggestions) raw-output)
       ;; TODO: write this in the buffer instead.
       (user-error "No matches found"))))
 
