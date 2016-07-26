@@ -2,7 +2,8 @@
 
 ;; Copyright (C) 2016  
 
-;; Author:  <wilfred@boogie>
+;; Author: Wilfred Hughes <me@wilfred.me.uk>
+;; Version: 0.1
 ;; Keywords: convenience
 
 ;; This program is free software; you can redistribute it and/or modify
