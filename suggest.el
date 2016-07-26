@@ -137,6 +137,8 @@ SUGGESTIONS is a list of forms."
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
+  ;; TODO: error on multiple inputs on one line.
+  ;; TOOD: graceful error if we can't eval inputs.
   (let* ((inputs (--map (eval (read it)) (suggest--raw-inputs)))
          (raw-output (suggest--raw-output))
          (desired-output (eval (read raw-output)))
