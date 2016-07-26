@@ -25,7 +25,37 @@
 
 ;;; Code:
 
+;; TODO: support arbitrary orderings of arguments?
+(defvar suggest-functions
+  '(identity
+    car
+    cdr
+    cadr
+    +
+    -
+    *
+    /)
+  "Functions that suggest will consider.
+These functions must not produce side effects.")
 
+(defface suggest-heading
+  '((((class color) (background light)) :foreground "DarkGoldenrod4" :weight bold)
+    (((class color) (background dark)) :foreground "LightGoldenrod2" :weight bold))
+  "Face for headings."
+  :group 'suggest)
+
+(defun suggest ()
+  "Open a Suggest buffer that provides suggestions for the inputs
+and outputs given."
+  (interactive)
+  (let ((buf (get-buffer-create "*suggest*")))
+    (switch-to-buffer buf)
+    (erase-buffer)
+    (suggest-mode)
+    (insert (propertize "hello world" 'face 'suggest-heading))))
+
+(define-derived-mode suggest-mode fundamental-mode "Suggest"
+  "A major mode for finding functions that provide the output requested.")
 
 (provide 'suggest)
 ;;; suggest.el ends here
