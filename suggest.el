@@ -30,15 +30,22 @@
 (require 'dash)
 
 ;; TODO: support arbitrary orderings of arguments?
+;; TODO: add dash.el, s.el too.
 (defvar suggest-functions
   '(identity
+    ;; Lists
     car
     cdr
     cadr
+    cons
+    ;; Arithmetic
     +
     -
     *
-    /)
+    /
+    ;; Strings
+    upcase
+    downcase)
   "Functions that suggest will consider.
 These functions must not produce side effects.")
 
