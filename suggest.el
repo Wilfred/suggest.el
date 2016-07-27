@@ -45,6 +45,8 @@
     -
     *
     /
+    1+
+    1-
     ;; Strings
     upcase
     downcase
