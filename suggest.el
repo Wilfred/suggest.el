@@ -47,7 +47,11 @@
     /
     ;; Strings
     upcase
-    downcase)
+    downcase
+    ;; Symbols
+    symbol-name
+    symbol-value
+    )
   "Functions that suggest will consider.
 These functions must not produce side effects.")
 
