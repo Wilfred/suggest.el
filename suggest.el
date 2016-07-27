@@ -66,11 +66,19 @@ These functions must not produce side effects.")
 (defvar suggest--outputs-heading ";; Desired output:")
 (defvar suggest--results-heading ";; Suggestions:")
 
-(defun suggest--heading (text)
-  "Format TEXT as a heading."
-  (propertize text
-              'face 'suggest-heading
-              'read-only t))
+(defun suggest--insert-heading (text)
+  "Highlight TEXT as a heading and insert in the current buffer."
+  ;; Make a note of where the heading starts.
+  (let ((start (point))
+        end)
+    ;; Insert the heading, ensuring it's not editable.
+    (insert (propertize text 'read-only t))
+    ;; Point is now at the end of the heading, save that position.
+    (setq end (point))
+    ;; Start the overlay after the ";; " bit.
+    (let ((overlay (make-overlay (+ 3 start) end)))
+      ;; Highlight the text in the heading.
+      (overlay-put overlay 'face 'suggest-heading))))
 
 (defun suggest--raw-inputs ()
   "Read the input lines in the current suggestion buffer."
@@ -111,12 +119,13 @@ and outputs given."
     (erase-buffer)
     (suggest-mode)
     (let ((inhibit-read-only t))
-      (insert (suggest--heading suggest--inputs-heading)
-              "\nnil\n\n"
-              (suggest--heading suggest--outputs-heading)
-              "\nnil\n\n"
-              (suggest--heading suggest--results-heading)
-              "\n(identity nil) ;=> nil"))))
+      (suggest--insert-heading suggest--inputs-heading)
+      (insert "\nnil\n\n")
+      (suggest--insert-heading suggest--outputs-heading)
+      (insert "\nnil\n\n")
+      (suggest--insert-heading suggest--results-heading)
+      ;; todo: use the normal write-suggestions function here.
+      (insert "\n(identity nil) ;=> nil"))))
 
 (defun suggest--write-suggestions (suggestions output)
   "Write SUGGESTIONS to the current *suggest* buffer.
