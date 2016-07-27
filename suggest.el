@@ -42,6 +42,7 @@
     cons
     nth
     list
+    length
     reverse
     ;; CL list functions.
     first
