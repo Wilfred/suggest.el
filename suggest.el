@@ -33,13 +33,63 @@
 ;; TODO: add dash.el, s.el too.
 (defvar suggest-functions
   '(identity
-    ;; Lists
+    ;; Build-in list functions.
     car
     cdr
     cadr
-    caddr
     cons
     nth
+    list
+    ;; CL list functions.
+    first
+    second
+    third
+    caddr
+    ;; dash.el list functions.
+    -non-nil
+    -slice
+    -take
+    -take-last
+    -drop
+    -drop-last
+    -select-by-indices
+    -select-column
+    -concat
+    -flatten
+    -replace
+    -replace-first
+    -insert-at
+    -replace-at
+    -remove-at
+    -remove-at-indices
+    -sum
+    -product
+    -min
+    -max
+    -is-prefix-p
+    -is-suffix-p
+    -is-infix-p
+    -split-at
+    -split-on
+    -partition
+    -partition-all
+    -elem-index
+    -elem-indices
+    -union
+    -difference
+    -intersection
+    -distinct
+    -rotate
+    -repeat
+    -cons*
+    -snoc
+    -interpose
+    -interleave
+    -zip
+    -first-item
+    -last-item
+    -butlast
+    
     ;; Arithmetic
     +
     -
@@ -55,7 +105,11 @@
     symbol-value
     )
   "Functions that suggest will consider.
-These functions must not produce side effects.")
+These functions must not produce side effects.
+
+The best functions for examples generally take a small number of
+arguments, and no arguments are functions. For other functions,
+the likelihood of users discovering them is too low.")
 
 (defface suggest-heading
   '((((class color) (background light)) :foreground "DarkGoldenrod4" :weight bold)
