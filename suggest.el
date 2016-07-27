@@ -215,18 +215,16 @@ need multiple examples to ensure they do what the user wants.")
 ;; multiple lines being entered.
 (defun suggest--raw-output ()
   "Read the output line in the current suggestion buffer."
-  (let ((headings-seen 0))
-    (loop-for-each-line
-      ;; Skip empty lines.
-      (when (equal it "")
-        (loop-continue))
-      ;; Note when we've seen the output header.
-      (when (suggest--on-heading-p)
-        (cl-incf headings-seen)
-        (loop-continue))
-      ;; The line after the output header is what we want.
-      (when (equal headings-seen 2)
-        (loop-return it)))))
+  (save-excursion
+    ;; Move past the 'desired output' heading.
+    (suggest--nth-heading 2)
+    (forward-line 1)
+    ;; Skip blank lines.
+    (while (looking-at "\n")
+      (forward-line 1))
+    ;; Return the current line.
+    (buffer-substring (point)
+                      (progn (move-end-of-line nil) (point)))))
 
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
@@ -245,17 +243,24 @@ and outputs given."
       ;; todo: use the normal write-suggestions function here.
       (insert "\n(identity nil) ;=> nil"))))
 
+(defun suggest--nth-heading (n)
+  "Move point to Nth heading in the current *suggest* buffer.
+N counts from 1."
+  (goto-char (point-min))
+  (let ((headings-seen 0))
+    (loop-while (< headings-seen n)
+      (when (suggest--on-heading-p)
+        (cl-incf headings-seen))
+      (forward-line 1)))
+  (forward-line -1))
+
 (defun suggest--write-suggestions (suggestions output)
   "Write SUGGESTIONS to the current *suggest* buffer.
 SUGGESTIONS is a list of forms."
   (save-excursion
-    (goto-char (point-min))
-    (let ((headings-seen 0))
-      ;; Move to the first line of the results.
-      (loop-while (< headings-seen 3)
-        (when (suggest--on-heading-p)
-          (cl-incf headings-seen))
-        (forward-line 1)))
+    ;; Move to the first line of the results.
+    (suggest--nth-heading 3)
+    (forward-line 1)
     ;; Remove the current suggestions.
     (delete-region (point) (point-max))
     ;; Insert all the suggestions given.
