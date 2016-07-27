@@ -231,9 +231,9 @@ need multiple examples to ensure they do what the user wants.")
 (defun suggest--buffer ()
   "Return the suggest buffer, plus a boolean saying
 whether we created a new buffer or if it already existed."
-  (let ((buf-name "*suggest*")
-        (buf (get-buffer buf-name))
-        (new-buffer nil))
+  (let* ((buf-name "*suggest*")
+         (buf (get-buffer buf-name))
+         (new-buffer nil))
     (unless buf
       (setq buf (get-buffer-create buf-name))
       (setq new-buffer t))
