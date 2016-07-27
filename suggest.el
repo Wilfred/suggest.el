@@ -40,6 +40,7 @@
     cons
     nth
     list
+    reverse
     ;; CL list functions.
     first
     second
