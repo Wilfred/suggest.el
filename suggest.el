@@ -28,6 +28,8 @@
 ;;; Code:
 
 (require 'dash)
+(eval-when-compile
+  (require 'cl-lib)) ;; cl-incf
 
 ;; TODO: support arbitrary orderings of arguments?
 ;; TODO: add (format %s _) somehow
@@ -187,34 +189,42 @@ need multiple examples to ensure they do what the user wants.")
       ;; Highlight the text in the heading.
       (overlay-put overlay 'face 'suggest-heading))))
 
+(defun suggest--on-heading-p ()
+  "Return t if point is on a heading."
+  (get-char-property (point) 'read-only))
+
 (defun suggest--raw-inputs ()
   "Read the input lines in the current suggestion buffer."
-  (let ((raw-inputs nil))
+  (let ((headings-seen 0)
+        (raw-inputs nil))
     (loop-for-each-line
-      ;; Skip over the inputs heading or lines without any content.
-      (when (or (equal it suggest--inputs-heading)
-                (equal it ""))
+      ;; Make a note of when we've passed the inputs heading.
+      (when (and (suggest--on-heading-p))
+        (cl-incf headings-seen)
+        (if (equal headings-seen 2)
+            ;; Stop once we reach the outputs.
+            (loop-return (nreverse raw-inputs))
+          (loop-continue)))
+      ;; Skip over empty lines.
+      (when (equal it "")
         (loop-continue))
-      ;; Stop once we reach the outputs.
-      (when (equal it suggest--outputs-heading)
-        (loop-return (nreverse raw-inputs)))
       (push it raw-inputs))))
 
 ;; TODO: check that there's only one line of output, or prevent
 ;; multiple lines being entered.
 (defun suggest--raw-output ()
   "Read the output line in the current suggestion buffer."
-  (let ((seen-output-header nil))
+  (let ((headings-seen 0))
     (loop-for-each-line
       ;; Skip empty lines.
       (when (equal it "")
         (loop-continue))
       ;; Note when we've seen the output header.
-      (when (equal it suggest--outputs-heading)
-        (setq seen-output-header t)
+      (when (suggest--on-heading-p)
+        (cl-incf headings-seen)
         (loop-continue))
       ;; The line after the output header is what we want.
-      (when seen-output-header
+      (when (equal headings-seen 2)
         (loop-return it)))))
 
 (defun suggest ()
