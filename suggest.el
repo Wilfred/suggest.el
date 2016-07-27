@@ -157,7 +157,7 @@ SUGGESTIONS is a list of forms."
       ;; TODO: write this in the buffer instead.
       (user-error "No matches found"))))
 
-(define-derived-mode suggest-mode fundamental-mode "Suggest"
+(define-derived-mode suggest-mode emacs-lisp-mode "Suggest"
   "A major mode for finding functions that provide the output requested.")
 
 ;; TODO: Pick one of these, both is silly
