@@ -203,6 +203,15 @@ SUGGESTIONS is a list of forms."
         (format " ;=> %s\n" output)
         'face 'font-lock-comment-face)))))
 
+(defun suggest--pretty-format (value)
+  "Return a pretty-printed version of VALUE."
+  (cond
+   ((null value) "nil")
+   ((eq value t) "t")
+   ((or (symbolp value) (consp value))
+    (format "'%s" value))
+   (t (format "%s" value))))
+
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
@@ -219,7 +228,11 @@ SUGGESTIONS is a list of forms."
           (when (equal func-output desired-output)
             (push (-concat (list it) raw-inputs) suggestions)))))
     (if suggestions
-        (suggest--write-suggestions (nreverse suggestions) raw-output)
+        (suggest--write-suggestions
+         (nreverse suggestions)
+         ;; We show the evalled output, not the raw input, so if
+         ;; users use variables, we show the value of that variable.
+         (suggest--pretty-format desired-output))
       ;; TODO: write this in the buffer instead.
       (user-error "No matches found"))))
 
