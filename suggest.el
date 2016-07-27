@@ -5,7 +5,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.1
 ;; Keywords: convenience
-;; Package-Requires: ((loop "1.3") (dash "2.12.0"))
+;; Package-Requires: ((loop "1.3") (dash "2.12.0") (s "1.11.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@
 (require 'dash)
 
 ;; TODO: support arbitrary orderings of arguments?
-;; TODO: add dash.el, s.el too.
 (defvar suggest-functions
   '(identity
     ;; Build-in list functions.
@@ -90,7 +89,6 @@
     -first-item
     -last-item
     -butlast
-    
     ;; Arithmetic
     +
     -
@@ -101,6 +99,36 @@
     ;; Strings
     upcase
     downcase
+    substring
+    concat
+    capitalize
+    ;; s.el string functions
+    s-trim
+    s-trim-left
+    s-trim-right
+    s-chomp
+    s-collapse-whitespace
+    s-word-wrap
+    s-left
+    s-chop-suffix
+    s-shared-start
+    s-shared-end
+    s-repeat
+    s-concat
+    s-prepend
+    s-append
+    s-lines
+    s-split
+    s-join
+    s-ends-with-p
+    s-starts-with-p
+    s-contains-p
+    s-replace
+    s-capitalize
+    s-index-of
+    s-reverse
+    s-count-matches
+    s-split-words
     ;; Symbols
     symbol-name
     symbol-value
@@ -110,7 +138,10 @@ These functions must not produce side effects.
 
 The best functions for examples generally take a small number of
 arguments, and no arguments are functions. For other functions,
-the likelihood of users discovering them is too low.")
+the likelihood of users discovering them is too low.
+
+Likewise, we avoid predicates of one argument, as those generally
+need multiple examples to ensure they do what the user wants.")
 
 (defface suggest-heading
   '((((class color) (background light)) :foreground "DarkGoldenrod4" :weight bold)
