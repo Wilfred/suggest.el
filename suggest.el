@@ -30,6 +30,7 @@
 (require 'dash)
 
 ;; TODO: support arbitrary orderings of arguments?
+;; TODO: add (format %s _) somehow
 (defvar suggest-functions
   '(identity
     ;; Build-in list functions.
@@ -94,6 +95,24 @@
     -
     *
     /
+    %
+    mod
+    max
+    min
+    ash
+    lsh
+    log
+    expt
+    sqrt
+    abs
+    float
+    round
+    truncate
+    ceiling
+    fceiling
+    ffloor
+    fround
+    ftruncate
     1+
     1-
     ;; Strings
