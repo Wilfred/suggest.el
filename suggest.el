@@ -197,7 +197,6 @@ SUGGESTIONS is a list of forms."
     (delete-region (point) (point-max))
     ;; Insert all the suggestions given.
     (--each suggestions
-      ;; TODO: ensure we wrap strings in double-quotes
       (insert (format "%s" it))
       (insert
        (propertize
@@ -211,6 +210,7 @@ SUGGESTIONS is a list of forms."
    ((eq value t) "t")
    ((or (symbolp value) (consp value))
     (format "'%s" value))
+   ((stringp value) (format "\"%s\"" value))
    (t (format "%s" value))))
 
 (defun suggest-update ()
