@@ -227,11 +227,22 @@ need multiple examples to ensure they do what the user wants.")
       (when (equal headings-seen 2)
         (loop-return it)))))
 
+(defun suggest--buffer ()
+  "Return the suggest buffer, plus a boolean saying
+whether we created a new buffer or if it already existed."
+  (let ((buf-name "*suggest*")
+        (buf (get-buffer buf-name))
+        (new-buffer nil))
+    (unless buf
+      (setq buf (get-buffer-create buf-name))
+      (setq new-buffer t))
+    (list buf new-buffer)))
+
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
 and outputs given."
   (interactive)
-  (let ((buf (get-buffer-create "*suggest*")))
+  (-let [(buf new-buffer) (suggest--buffer)]
     (switch-to-buffer buf)
     (erase-buffer)
     (suggest-mode)
