@@ -208,7 +208,8 @@ SUGGESTIONS is a list of forms."
   (interactive)
   ;; TODO: error on multiple inputs on one line.
   ;; TOOD: graceful error if we can't eval inputs.
-  (let* ((inputs (--map (eval (read it)) (suggest--raw-inputs)))
+  (let* ((raw-inputs (suggest--raw-inputs))
+         (inputs (--map (eval (read it)) raw-inputs))
          (raw-output (suggest--raw-output))
          (desired-output (eval (read raw-output)))
          (suggestions nil))
@@ -216,7 +217,7 @@ SUGGESTIONS is a list of forms."
       (ignore-errors
         (let ((func-output (apply it inputs)))
           (when (equal func-output desired-output)
-            (push (-concat (list it) inputs) suggestions)))))
+            (push (-concat (list it) raw-inputs) suggestions)))))
     (if suggestions
         (suggest--write-suggestions (nreverse suggestions) raw-output)
       ;; TODO: write this in the buffer instead.
