@@ -261,7 +261,7 @@ SUGGESTIONS is a list of forms."
   (save-excursion
     (goto-char (point-min))
     ;; Move to the first line of the results.
-    (while (not (looking-at suggest--results-heading))
+    (while (not (suggest--on-heading-p))
       (forward-line 1))
     (forward-line 1)
     ;; Remove the current suggestions.
