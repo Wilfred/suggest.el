@@ -261,10 +261,12 @@ and outputs given."
 SUGGESTIONS is a list of forms."
   (save-excursion
     (goto-char (point-min))
-    ;; Move to the first line of the results.
-    (while (not (suggest--on-heading-p))
-      (forward-line 1))
-    (forward-line 1)
+    (let ((headings-seen 0))
+      ;; Move to the first line of the results.
+      (loop-while (< headings-seen 3)
+        (when (suggest--on-heading-p)
+          (cl-incf headings-seen))
+        (forward-line 1)))
     ;; Remove the current suggestions.
     (delete-region (point) (point-max))
     ;; Insert all the suggestions given.
