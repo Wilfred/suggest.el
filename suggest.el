@@ -261,19 +261,18 @@ N counts from 1."
 (defun suggest--write-suggestions (suggestions output)
   "Write SUGGESTIONS to the current *suggest* buffer.
 SUGGESTIONS is a list of forms."
-  (save-excursion
-    ;; Move to the first line of the results.
-    (suggest--nth-heading 3)
-    (forward-line 1)
-    ;; Remove the current suggestions.
-    (delete-region (point) (point-max))
-    ;; Insert all the suggestions given.
-    (--each suggestions
-      (insert (format "%s" it))
-      (insert
-       (propertize
-        (format " ;=> %s\n" output)
-        'face 'font-lock-comment-face)))))
+  (let ((inhibit-read-only t))
+    (save-excursion
+      ;; Move to the first line of the results.
+      (suggest--nth-heading 3)
+      (forward-line 1)
+      ;; Remove the current suggestions.
+      (delete-region (point) (point-max))
+      ;; Insert all the suggestions given.
+      (--each suggestions
+        (insert
+         (propertize (format "%s ;=> %s\n" it output)
+                     'read-only t))))))
 
 (defun suggest--pretty-format (value)
   "Return a pretty-printed version of VALUE."
