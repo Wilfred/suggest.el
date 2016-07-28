@@ -288,15 +288,21 @@ SUGGESTIONS is a list of forms."
    ((stringp value) (format "\"%s\"" value))
    (t (format "%s" value))))
 
+(defun suggest--read-eval (form)
+  "Read and eval FORM, but don't open a debugger on errors."
+  (condition-case err
+      (eval (read form))
+    (error (user-error
+            "Could not eval %s: %s" form err))))
+
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
   ;; TODO: error on multiple inputs on one line.
-  ;; TOOD: graceful error if we can't eval inputs.
   (let* ((raw-inputs (suggest--raw-inputs))
-         (inputs (--map (eval (read it)) raw-inputs))
+         (inputs (--map (suggest--read-eval it) raw-inputs))
          (raw-output (suggest--raw-output))
-         (desired-output (eval (read raw-output)))
+         (desired-output (suggest--read-eval raw-output))
          (suggestions nil))
     (--each suggest-functions
       (ignore-errors
