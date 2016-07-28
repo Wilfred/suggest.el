@@ -311,6 +311,19 @@ SUGGESTIONS is a list of forms."
            (--each remainder-perms (push (cons element it) permutations))))
        (nreverse permutations)))))
 
+(defun suggest--possibilities (raw-inputs inputs output)
+  "Return a list of possibilities for these INPUTS and OUTPUT.
+Each possbility form uses RAW-INPUTS so we show variables rather
+than their values."
+  ;; TODO: extract an accumulate macro?
+  (let ((possibilities nil))
+    (--each suggest-functions
+      (ignore-errors
+        (let ((func-output (apply it inputs)))
+          (when (equal func-output output)
+            (push (-concat (list it) raw-inputs) possibilities)))))
+    (nreverse possibilities)))
+
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
@@ -319,15 +332,11 @@ SUGGESTIONS is a list of forms."
          (inputs (--map (suggest--read-eval it) raw-inputs))
          (raw-output (suggest--raw-output))
          (desired-output (suggest--read-eval raw-output))
-         (suggestions nil))
-    (--each suggest-functions
-      (ignore-errors
-        (let ((func-output (apply it inputs)))
-          (when (equal func-output desired-output)
-            (push (-concat (list it) raw-inputs) suggestions)))))
-    (if suggestions
+         (possibilities
+          (suggest--possibilities raw-inputs inputs desired-output)))
+    (if possibilities
         (suggest--write-suggestions
-         (nreverse suggestions)
+         possibilities
          ;; We show the evalled output, not the raw input, so if
          ;; users use variables, we show the value of that variable.
          (suggest--pretty-format desired-output))
