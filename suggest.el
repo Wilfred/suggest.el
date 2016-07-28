@@ -295,6 +295,22 @@ SUGGESTIONS is a list of forms."
     (error (user-error
             "Could not eval %s: %s" form err))))
 
+;; TODO: this would be a good match for dash.el.
+(defun suggest--permutations (lst)
+  "Return a list of all possible orderings of list LST."
+  (cl-case (length lst)
+    (0 nil)
+    (1 (list lst))
+    (t
+     ;; TODO: this is ugly.
+     (let ((permutations nil))
+       (--each-indexed lst
+         (let* ((element it)
+                (remainder (-remove-at it-index lst))
+                (remainder-perms (suggest--permutations remainder)))
+           (--each remainder-perms (push (cons element it) permutations))))
+       (nreverse permutations)))))
+
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
