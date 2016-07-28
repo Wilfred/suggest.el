@@ -309,8 +309,7 @@ SUGGESTIONS is a list of forms."
          ;; We show the evalled output, not the raw input, so if
          ;; users use variables, we show the value of that variable.
          (suggest--pretty-format desired-output))
-      ;; TODO: write this in the buffer instead.
-      (user-error "No matches found")))
+      (suggest--write-suggestions-string ";; No matches found.")))
   (set-buffer-modified-p nil))
 
 (define-derived-mode suggest-mode emacs-lisp-mode "Suggest"
