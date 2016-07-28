@@ -236,12 +236,16 @@ and outputs given."
     (suggest-mode)
     (let ((inhibit-read-only t))
       (suggest--insert-heading suggest--inputs-heading)
-      (insert "\nnil\n\n")
+      (insert "\n1\n2\n\n")
       (suggest--insert-heading suggest--outputs-heading)
-      (insert "\nnil\n\n")
+      (insert "\n3\n\n")
       (suggest--insert-heading suggest--results-heading)
-      ;; todo: use the normal write-suggestions function here.
-      (insert "\n(identity nil) ;=> nil"))))
+      (insert "\n"))
+    ;; Populate the suggestions for 1, 2 => 3
+    (suggest-update)
+    ;; Put point on the first input.
+    (suggest--nth-heading 1)
+    (forward-line 1)))
 
 (defun suggest--nth-heading (n)
   "Move point to Nth heading in the current *suggest* buffer.
