@@ -328,7 +328,7 @@ N counts from 1."
   "Write SUGGESTIONS to the current *suggest* buffer.
 SUGGESTIONS is a list of forms."
   (->> suggestions
-       (--map (format "%s ;=> %s\n" it output))
+       (--map (format "%s ;=> %s" it output))
        (s-join "\n")
        (suggest--write-suggestions-string)))
 
