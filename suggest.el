@@ -28,10 +28,10 @@
 ;;; Code:
 
 (require 'dash)
+(require 'loop)
 (eval-when-compile
   (require 'cl-lib)) ;; cl-incf
 
-;; TODO: support arbitrary orderings of arguments?
 ;; TODO: add (format %s _) somehow
 (defvar suggest-functions
   '(identity
@@ -345,13 +345,31 @@ Assumes all sublists are the same length."
   "Return a list of possibilities for these INPUTS and OUTPUT.
 Each possbility form uses RAW-INPUTS so we show variables rather
 than their values."
-  ;; TODO: extract an accumulate macro?
-  (let ((possibilities nil))
-    (--each suggest-functions
-      (ignore-errors
-        (let ((func-output (apply it inputs)))
-          (when (equal func-output output)
-            (push (-concat (list it) raw-inputs) possibilities)))))
+  ;; E.g. ((1 "1") (2 "x"))
+  (let* ((inputs-with-raws (suggest--zip inputs raw-inputs))
+         ;; Each possible ordering of our inputs.
+         (inputs-with-raws-perms (suggest--permutations inputs-with-raws))
+         ;; E.g. (((1 2) ("1" "x")) ((2 1) ("x" "1")))
+         (inputs-with-raws-perms-pairwise
+          (-map #'suggest--unzip inputs-with-raws-perms))
+         (possibilities nil))
+    ;; Loop over every function.
+    (loop-for-each func suggest-functions
+      ;; For every possible input ordering,
+      (loop-for-each inputs-raws-perm inputs-with-raws-perms-pairwise
+        (-let [(inputs-perm raws-perm) inputs-raws-perm]
+          ;; Try to evaluate the function.
+          (ignore-errors
+            (let ((func-output (apply func inputs-perm)))
+              ;; If the function gaves us the output we wanted:
+              (when (equal func-output output)
+                ;; Save the function with the raw inputs.
+                (push (cons func raws-perm) possibilities)
+                ;; Don't try any other input permutations for this
+                ;; function.  This saves us returning multiple results
+                ;; for functions that don't care about ordering, like
+                ;; +.
+                (loop-break)))))))
     (nreverse possibilities)))
 
 (defun suggest-update ()
