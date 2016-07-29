@@ -321,9 +321,21 @@ SUGGESTIONS is a list of forms."
            (--each remainder-perms (push (cons element it) permutations))))
        (nreverse permutations)))))
 
+(defun suggest--zip (&rest lists)
+  "Zip LISTS together.  Group the head of each list, followed by the
+second elements of each list, and so on. The lengths of the returned
+groupings are equal to the length of the shortest input list.
+
+Unlike dash 2.0, always uses lists."
+  (let (results)
+    (while (-none-p #'null lists)
+      (setq results (cons (mapcar 'car lists) results))
+      (setq lists (mapcar #'cdr lists)))
+    (nreverse results)))
+
 ;; TODO: this would also be a good match for dash.el
 (defun suggest--unzip (lst)
-  "Inverse of `-zip'.
+  "Inverse of `suggest--zip'.
 Assumes all sublists are the same length."
   (let ((result nil))
     (dotimes (i (length (-first-item lst)) (nreverse result))

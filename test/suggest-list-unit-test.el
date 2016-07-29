@@ -18,6 +18,12 @@
    (equal (suggest--permutations '(x y))
           '((x y) (y x)))))
 
+(ert-deftest suggest-zip ()
+  "Our zip implementation should always return proper lists."
+  (should (equal
+           (suggest--zip '(x1 x2) '(y1 y2))
+           '((x1 y1) (x2 y2)))))
+
 (ert-deftest suggest-unzip-nil ()
   (should (equal (suggest--unzip nil) nil)))
 
