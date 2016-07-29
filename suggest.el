@@ -278,15 +278,24 @@ SUGGESTIONS is a list of forms."
        (s-join "\n")
        (suggest--write-suggestions-string)))
 
+;; TODO: this is largely duplicated with refine.el and should be
+;; factored out somewhere.
 (defun suggest--pretty-format (value)
   "Return a pretty-printed version of VALUE."
-  (cond
-   ((null value) "nil")
-   ((eq value t) "t")
-   ((or (symbolp value) (consp value))
-    (format "'%s" value))
-   ((stringp value) (format "\"%s\"" value))
-   (t (format "%s" value))))
+  (let ((cl-formatted (with-temp-buffer
+                        (cl-prettyprint value)
+                        (s-trim (buffer-string)))))
+    (cond ((stringp value)
+           (format "\"%s\"" value))
+          ;; Print nil and t as-is.'
+          ((or (eq t value) (eq nil value))
+           (format "%s" value))
+          ;; Display other symbols, and lists, with a quote, so we
+          ;; show usable syntax.
+          ((or (symbolp value) (consp value))
+           (format "'%s" cl-formatted))
+          (t
+           cl-formatted))))
 
 (defun suggest--read-eval (form)
   "Read and eval FORM, but don't open a debugger on errors."
