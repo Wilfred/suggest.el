@@ -29,6 +29,7 @@
 
 (require 'dash)
 (require 'loop)
+(require 's)
 (eval-when-compile
   (require 'cl-lib)) ;; cl-incf
 
