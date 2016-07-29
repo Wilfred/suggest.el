@@ -426,8 +426,6 @@ than their values."
 (define-derived-mode suggest-mode emacs-lisp-mode "Suggest"
   "A major mode for finding functions that provide the output requested.")
 
-;; TODO: Pick one of these, both is silly
-(define-key suggest-mode-map (kbd "<C-return>") #'suggest-update)
 (define-key suggest-mode-map (kbd "C-c C-c") #'suggest-update)
 
 (provide 'suggest)
