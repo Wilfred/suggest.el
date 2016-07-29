@@ -312,6 +312,7 @@ SUGGESTIONS is a list of forms."
     (1 (list lst))
     (t
      ;; TODO: this is ugly.
+     ;; TODO: extract an accumulate macro?
      (let ((permutations nil))
        (--each-indexed lst
          (let* ((element it)
