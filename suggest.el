@@ -39,6 +39,7 @@
     car
     cdr
     cadr
+    cdar
     cons
     nth
     list
@@ -48,7 +49,6 @@
     first
     second
     third
-    caddr
     ;; dash.el list functions.
     -non-nil
     -slice
@@ -93,6 +93,15 @@
     -first-item
     -last-item
     -butlast
+    ;; alist functions
+    assoc
+    ;; plist functions
+    plist-get
+    plist-member
+    ;; hash tables
+    gethash
+    hash-table-keys
+    hash-table-items
     ;; Arithmetic
     +
     -
@@ -154,6 +163,30 @@
     ;; Symbols
     symbol-name
     symbol-value
+    ;; Paths
+    file-name-as-directory
+    file-name-base
+    file-name-directory
+    file-name-extension
+    expand-file-name
+    ;; Paths with f.el
+    f-join
+    f-split
+    f-filename
+    f-parent
+    f-common-parent
+    f-ext
+    f-no-ext
+    f-base
+    f-short
+    f-long
+    f-canonical
+    f-slash
+    f-depth
+    ;; These are not pure, but still safe:
+    f-files
+    f-directories
+    f-entries
     )
   "Functions that suggest will consider.
 These functions must not produce side effects.
