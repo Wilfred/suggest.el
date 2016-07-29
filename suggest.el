@@ -35,160 +35,161 @@
 
 ;; TODO: add (format %s _) somehow
 (defvar suggest-functions
-  '(identity
-    ;; Build-in list functions.
-    car
-    cdr
-    cadr
-    cdar
-    cons
-    nth
-    list
-    length
-    reverse
-    ;; CL list functions.
-    first
-    second
-    third
-    ;; dash.el list functions.
-    -non-nil
-    -slice
-    -take
-    -take-last
-    -drop
-    -drop-last
-    -select-by-indices
-    -select-column
-    -concat
-    -flatten
-    -replace
-    -replace-first
-    -insert-at
-    -replace-at
-    -remove-at
-    -remove-at-indices
-    -sum
-    -product
-    -min
-    -max
-    -is-prefix-p
-    -is-suffix-p
-    -is-infix-p
-    -split-at
-    -split-on
-    -partition
-    -partition-all
-    -elem-index
-    -elem-indices
-    -union
-    -difference
-    -intersection
-    -distinct
-    -rotate
-    -repeat
-    -cons*
-    -snoc
-    -interpose
-    -interleave
-    -zip
-    -first-item
-    -last-item
-    -butlast
-    ;; alist functions
-    assoc
-    ;; plist functions
-    plist-get
-    plist-member
-    ;; hash tables
-    gethash
-    hash-table-keys
-    hash-table-items
-    ;; Arithmetic
-    +
-    -
-    *
-    /
-    %
-    mod
-    max
-    min
-    ash
-    lsh
-    log
-    expt
-    sqrt
-    abs
-    float
-    round
-    truncate
-    ceiling
-    fceiling
-    ffloor
-    fround
-    ftruncate
-    1+
-    1-
-    ;; Strings
-    upcase
-    downcase
-    substring
-    concat
-    capitalize
-    ;; s.el string functions
-    s-trim
-    s-trim-left
-    s-trim-right
-    s-chomp
-    s-collapse-whitespace
-    s-word-wrap
-    s-left
-    s-chop-suffix
-    s-shared-start
-    s-shared-end
-    s-repeat
-    s-concat
-    s-prepend
-    s-append
-    s-lines
-    s-split
-    s-join
-    s-ends-with-p
-    s-starts-with-p
-    s-contains-p
-    s-replace
-    s-capitalize
-    s-index-of
-    s-reverse
-    s-count-matches
-    s-split-words
-    ;; Symbols
-    symbol-name
-    symbol-value
-    ;; Paths
-    file-name-as-directory
-    file-name-base
-    file-name-directory
-    file-name-extension
-    expand-file-name
-    ;; Paths with f.el
-    f-join
-    f-split
-    f-filename
-    f-parent
-    f-common-parent
-    f-ext
-    f-no-ext
-    f-base
-    f-short
-    f-long
-    f-canonical
-    f-slash
-    f-depth
-    ;; These are not pure, but still safe:
-    f-files
-    f-directories
-    f-entries
-    )
+  (list
+   #'identity
+   ;; Build-in list functions.
+   #'car
+   #'cdr
+   #'cadr
+   #'cdar
+   #'cons
+   #'nth
+   #'list
+   #'length
+   #'reverse
+   ;; CL list functions.
+   #'first
+   #'second
+   #'third
+   ;; dash.el list functions.
+   #'-non-nil
+   #'-slice
+   #'-take
+   #'-take-last
+   #'-drop
+   #'-drop-last
+   #'-select-by-indices
+   #'-select-column
+   #'-concat
+   #'-flatten
+   #'-replace
+   #'-replace-first
+   #'-insert-at
+   #'-replace-at
+   #'-remove-at
+   #'-remove-at-indices
+   #'-sum
+   #'-product
+   #'-min
+   #'-max
+   #'-is-prefix-p
+   #'-is-suffix-p
+   #'-is-infix-p
+   #'-split-at
+   #'-split-on
+   #'-partition
+   #'-partition-all
+   #'-elem-index
+   #'-elem-indices
+   #'-union
+   #'-difference
+   #'-intersection
+   #'-distinct
+   #'-rotate
+   #'-repeat
+   #'-cons*
+   #'-snoc
+   #'-interpose
+   #'-interleave
+   #'-zip
+   #'-first-item
+   #'-last-item
+   #'-butlast
+   ;; alist functions
+   #'assoc
+   ;; plist functions
+   #'plist-get
+   #'plist-member
+   ;; hash tables
+   #'gethash
+   #'hash-table-keys
+   #'hash-table-values
+   ;; Arithmetic
+   #'+
+   #'-
+   #'*
+   #'/
+   #'%
+   #'mod
+   #'max
+   #'min
+   #'ash
+   #'lsh
+   #'log
+   #'expt
+   #'sqrt
+   #'abs
+   #'float
+   #'round
+   #'truncate
+   #'ceiling
+   #'fceiling
+   #'ffloor
+   #'fround
+   #'ftruncate
+   #'1+
+   #'1-
+   ;; Strings
+   #'upcase
+   #'downcase
+   #'substring
+   #'concat
+   #'capitalize
+   ;; s.el string functions
+   #'s-trim
+   #'s-trim-left
+   #'s-trim-right
+   #'s-chomp
+   #'s-collapse-whitespace
+   #'s-word-wrap
+   #'s-left
+   #'s-chop-suffix
+   #'s-shared-start
+   #'s-shared-end
+   #'s-repeat
+   #'s-concat
+   #'s-prepend
+   #'s-append
+   #'s-lines
+   #'s-split
+   #'s-join
+   #'s-ends-with-p
+   #'s-starts-with-p
+   #'s-contains-p
+   #'s-replace
+   #'s-capitalize
+   #'s-index-of
+   #'s-reverse
+   #'s-count-matches
+   #'s-split-words
+   ;; Symbols
+   #'symbol-name
+   #'symbol-value
+   ;; Paths
+   #'file-name-as-directory
+   #'file-name-base
+   #'file-name-directory
+   #'file-name-extension
+   #'expand-file-name
+   ;; Paths with f.el
+   #'f-join
+   #'f-split
+   #'f-filename
+   #'f-parent
+   #'f-common-parent
+   #'f-ext
+   #'f-no-ext
+   #'f-base
+   #'f-short
+   #'f-long
+   #'f-canonical
+   #'f-slash
+   #'f-depth
+   ;; These are not pure, but still safe:
+   #'f-files
+   #'f-directories
+   #'f-entries
+   )
   "Functions that suggest will consider.
 These functions must not produce side effects.
 
