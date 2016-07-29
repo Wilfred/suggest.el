@@ -320,6 +320,14 @@ SUGGESTIONS is a list of forms."
            (--each remainder-perms (push (cons element it) permutations))))
        (nreverse permutations)))))
 
+;; TODO: this would also be a good match for dash.el
+(defun suggest--unzip (lst)
+  "Inverse of `-zip'.
+Assumes all sublists are the same length."
+  (let ((result nil))
+    (dotimes (i (length (-first-item lst)) (nreverse result))
+      (push (-select-column i lst) result))))
+
 (defun suggest--possibilities (raw-inputs inputs output)
   "Return a list of possibilities for these INPUTS and OUTPUT.
 Each possbility form uses RAW-INPUTS so we show variables rather
