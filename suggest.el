@@ -258,6 +258,25 @@ need multiple examples to ensure they do what the user wants.")
     (buffer-substring (point)
                       (progn (move-end-of-line nil) (point)))))
 
+(defun suggest--keybinding (command keymap)
+  "Find the keybinding for COMMAND in KEYMAP."
+  (car (where-is-internal command keymap)))
+
+(defun suggest--update-needed (update-needed)
+  "Update the suggestions heading to say whether we need
+the user to call `suggest-update'."
+  (save-excursion
+    (goto-char (point-min))
+    (suggest--nth-heading 3)
+    (let ((inhibit-read-only t))
+      (delete-region (point) (progn (move-end-of-line nil) (point)))
+      (if update-needed
+          (suggest--insert-heading
+           (format ";; Suggestions (press %s to update):"
+                   (key-description
+                    (suggest--keybinding #'suggest-update suggest-mode-map))))
+        (suggest--insert-heading suggest--results-heading)))))
+
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
 and outputs given."
@@ -277,7 +296,10 @@ and outputs given."
     (suggest-update)
     ;; Put point on the first input.
     (suggest--nth-heading 1)
-    (forward-line 1)))
+    (forward-line 1))
+  (add-hook 'first-change-hook
+            (lambda () (suggest--update-needed t))
+            nil t))
 
 (defun suggest--nth-heading (n)
   "Move point to Nth heading in the current *suggest* buffer.
@@ -421,6 +443,7 @@ than their values."
          ;; users use variables, we show the value of that variable.
          (suggest--pretty-format desired-output))
       (suggest--write-suggestions-string ";; No matches found.")))
+  (suggest--update-needed nil)
   (set-buffer-modified-p nil))
 
 (define-derived-mode suggest-mode emacs-lisp-mode "Suggest"
