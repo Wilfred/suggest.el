@@ -5,7 +5,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.1
 ;; Keywords: convenience
-;; Package-Requires: ((loop "1.3") (dash "2.12.0") (s "1.11.0"))
+;; Package-Requires: ((loop "1.3") (dash "2.12.0") (s "1.11.0") (f "0.18.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
