@@ -266,21 +266,6 @@ need multiple examples to ensure they do what the user wants.")
   "Find the keybinding for COMMAND in KEYMAP."
   (car (where-is-internal command keymap)))
 
-(defun suggest--update-needed (update-needed)
-  "Update the suggestions heading to say whether we need
-the user to call `suggest-update'."
-  (save-excursion
-    (goto-char (point-min))
-    (suggest--nth-heading 3)
-    (let ((inhibit-read-only t))
-      (delete-region (point) (progn (move-end-of-line nil) (point)))
-      (if update-needed
-          (suggest--insert-heading
-           (format ";; Suggestions (press %s to update):"
-                   (key-description
-                    (suggest--keybinding #'suggest-update suggest-mode-map))))
-        (suggest--insert-heading suggest--results-heading)))))
-
 ;;;###autoload
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
@@ -456,6 +441,21 @@ than their values."
   "A major mode for finding functions that provide the output requested.")
 
 (define-key suggest-mode-map (kbd "C-c C-c") #'suggest-update)
+
+(defun suggest--update-needed (update-needed)
+  "Update the suggestions heading to say whether we need
+the user to call `suggest-update'."
+  (save-excursion
+    (goto-char (point-min))
+    (suggest--nth-heading 3)
+    (let ((inhibit-read-only t))
+      (delete-region (point) (progn (move-end-of-line nil) (point)))
+      (if update-needed
+          (suggest--insert-heading
+           (format ";; Suggestions (press %s to update):"
+                   (key-description
+                    (suggest--keybinding #'suggest-update suggest-mode-map))))
+        (suggest--insert-heading suggest--results-heading)))))
 
 (provide 'suggest)
 ;;; suggest.el ends here
