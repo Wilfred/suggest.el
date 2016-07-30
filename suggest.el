@@ -279,6 +279,7 @@ the user to call `suggest-update'."
                     (suggest--keybinding #'suggest-update suggest-mode-map))))
         (suggest--insert-heading suggest--results-heading)))))
 
+;;;###autoload
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
 and outputs given."
@@ -428,6 +429,7 @@ than their values."
                 (loop-break)))))))
     (nreverse possibilities)))
 
+;;;###autoload
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
