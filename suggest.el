@@ -36,6 +36,7 @@
   (require 'cl-lib)) ;; cl-incf
 
 ;; TODO: add (format %s _) somehow
+;; TODO: add #'read, but don't prompt for input when the example is nil.
 (defvar suggest-functions
   (list
    #'identity
