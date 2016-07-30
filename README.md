@@ -20,6 +20,17 @@ pure functions with a small number of arguments using only simple data
 types. We only include functions that users could 'stumble upon' with
 the right set of inputs.
 
+## Related projects
+
+This project was inspired by the Finder in Smalltalk, which does
+something similar. There's
+[a great demo video here](https://www.youtube.com/watch?v=HOuZyOKa91o#t=5m05s).
+
+There are some other niche tools that take other approaches. For
+example, [cant for Python](https://github.com/kootenpv/cant) tries
+every function in scope (without a safety whitelist) to find
+functionality.
+
 ## License
 
 GPLv3.
