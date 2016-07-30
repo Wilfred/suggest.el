@@ -48,9 +48,9 @@
    #'length
    #'reverse
    ;; CL list functions.
-   #'first
-   #'second
-   #'third
+   #'cl-first
+   #'cl-second
+   #'cl-third
    ;; dash.el list functions.
    #'-non-nil
    #'-slice
