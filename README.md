@@ -7,7 +7,8 @@
 [![MELPA](http://melpa.org/packages/suggest-badge.svg)](http://melpa.org/#/suggest)
 
 suggest.el is an Emacs package for discovering elisp functions based
-on examples.
+on examples. See my blog post:
+[Example Driven Development](http://www.wilfred.me.uk/blog/2016/07/30/example-driven-development/).
 
 ![suggest](suggest_screenshot.png)
 
