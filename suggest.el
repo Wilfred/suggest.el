@@ -50,6 +50,7 @@
    #'list
    #'length
    #'reverse
+   #'append
    ;; CL list functions.
    #'cl-first
    #'cl-second
