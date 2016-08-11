@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016  
 
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
-;; Version: 0.1
+;; Version: 0.2
 ;; Keywords: convenience
 ;; Package-Requires: ((loop "1.3") (dash "2.12.0") (s "1.11.0") (f "0.18.2"))
 
