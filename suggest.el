@@ -51,6 +51,8 @@
    #'length
    #'reverse
    #'append
+   ;; Sequence functions
+   #'elt
    ;; CL list functions.
    #'cl-first
    #'cl-second
