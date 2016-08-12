@@ -219,10 +219,15 @@ need multiple examples to ensure they do what the user wants.")
 (defun suggest--insert-heading (text)
   "Highlight TEXT as a heading and insert in the current buffer."
   ;; Make a note of where the heading starts.
-  (let ((start (point))
+  (let ((excluding-last (substring text 0 (1- (length text))))
+        (last-char (substring text (1- (length text))))
+        (start (point))
         end)
     ;; Insert the heading, ensuring it's not editable.
-    (insert (propertize text 'read-only t))
+    ;; TODO: this still allows users to delete the :, but
+    ;; at least it lets users press enter after heading.
+    (insert (propertize excluding-last 'read-only t))
+    (insert last-char)
     ;; Point is now at the end of the heading, save that position.
     (setq end (point))
     ;; Start the overlay after the ";; " bit.
