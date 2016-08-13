@@ -22,6 +22,13 @@ pure functions with a small number of arguments using only simple data
 types. We only include functions that users could 'stumble upon' with
 the right set of inputs.
 
+## Installation
+
+suggest.el is available on [MELPA](http://melpa.org/) and
+[MELPA stable](https://stable.melpa.org/). Note that suggest.el
+currently depends on a recent build dash.el, specifically the 7th of
+May 2016 or later.
+
 ## Related projects
 
 This project was inspired by the Finder in Smalltalk, which does
