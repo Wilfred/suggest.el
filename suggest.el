@@ -51,6 +51,7 @@
    #'length
    #'reverse
    #'append
+   #'butlast
    ;; Sequence functions
    #'elt
    ;; CL list functions.
