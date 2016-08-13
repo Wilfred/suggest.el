@@ -20,3 +20,13 @@
   (should
    (equal
     (suggest--pretty-format '("foo")) "'(\"foo\")")))
+
+(ert-deftest suggest-format-output-symbol ()
+  (should
+   (equal
+    (suggest--format-output 'foo) ";=> 'foo")))
+
+(ert-deftest suggest-format-output-multiline ()
+  (should
+   (equal
+    (suggest--format-output "foo\nbar") ";=> \"foo\n;   bar\"")))

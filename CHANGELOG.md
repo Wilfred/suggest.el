@@ -8,6 +8,9 @@ RET at the end of a heading line.
 We can now suggest `(apply #'some-func some-list)` too. Try an input
 of `'(2 3 4)` and an output of `24`.
 
+Fixed an issue displaying function outputs that spread over multiple
+lines.
+
 # v0.1
 
 Initial release.

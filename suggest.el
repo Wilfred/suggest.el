@@ -324,11 +324,39 @@ N counts from 1."
       ;; Insert the text, ensuring it can't be edited.
       (insert (propertize text 'read-only t)))))
 
+(defun suggest--format-output (value)
+  "Format VALUE as the output to a function."
+  (let* ((lines (s-lines (suggest--pretty-format value)))
+         (prefixed-lines
+          (--map-indexed
+           (if (zerop it-index) (concat ";=> " it) (concat ";   " it))
+           lines)))
+    (s-join "\n" prefixed-lines)))
+
+;; TODO: why does SUGGESTION get *fontified* strings?
+(defun suggest--format-suggestion (suggestion output)
+  "Format SUGGESTION as a lisp expression returning OUTPUT."
+  ;; SUGGESTION is a list that may contain strings, so we can show
+  ;; e.g. #'foo rather than 'foo.
+  (let* ((formatted-suggestion (format "%s" suggestion))
+         ;; A string of spaces the same length as the suggestion.
+         (matching-spaces (s-repeat (length formatted-suggestion) " "))
+         (formatted-output (suggest--format-output output))
+         ;; Append the output to the formatted suggestion. If the
+         ;; output runs over multiple lines, indent appropriately.
+         (formatted-lines
+          (--map-indexed
+           (if (zerop it-index)
+               (format "%s %s" formatted-suggestion it)
+             (format "%s %s" matching-spaces it))
+           (s-lines formatted-output))))
+    (s-join "\n" formatted-lines)))
+
 (defun suggest--write-suggestions (suggestions output)
   "Write SUGGESTIONS to the current *suggest* buffer.
 SUGGESTIONS is a list of forms."
   (->> suggestions
-       (--map (format "%s ;=> %s" it output))
+       (--map (suggest--format-suggestion it output))
        (s-join "\n")
        (suggest--write-suggestions-string)))
 
@@ -455,7 +483,7 @@ than their values."
          possibilities
          ;; We show the evalled output, not the raw input, so if
          ;; users use variables, we show the value of that variable.
-         (suggest--pretty-format desired-output))
+         desired-output)
       (suggest--write-suggestions-string ";; No matches found.")))
   (suggest--update-needed nil)
   (set-buffer-modified-p nil))
