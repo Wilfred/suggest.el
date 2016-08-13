@@ -415,7 +415,7 @@ than their values."
           ;; Try to evaluate the function.
           (ignore-errors
             (let ((func-output (apply func inputs-perm)))
-              ;; If the function gaves us the output we wanted:
+              ;; If the function gave us the output we wanted:
               (when (equal func-output output)
                 ;; Save the function with the raw inputs.
                 (push (cons func raws-perm) possibilities)
