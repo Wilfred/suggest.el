@@ -423,7 +423,19 @@ than their values."
                 ;; function.  This saves us returning multiple results
                 ;; for functions that don't care about ordering, like
                 ;; +.
-                (loop-break)))))))
+                (loop-break))))))
+      ;; If the input is a single list, try calling the function
+      ;; variadically.
+      (when (and
+             (equal (length inputs) 1)
+             (listp (-first-item inputs)))
+        (ignore-errors
+          (let ((func-output (apply func (-first-item inputs))))
+            ;; If the function gave us the output we wanted:
+            (when (equal func-output output)
+              ;; Save the funcall form of calling this function.
+              (push (list 'apply (format "#'%s" func) (-first-item raw-inputs))
+                    possibilities))))))
     (nreverse possibilities)))
 
 ;;;###autoload
