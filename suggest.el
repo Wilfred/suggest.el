@@ -340,6 +340,7 @@ SUGGESTIONS is a list of forms."
                         (cl-prettyprint value)
                         (s-trim (buffer-string)))))
     (cond ((stringp value)
+           ;; TODO: we should format newlines as \n
            (format "\"%s\"" value))
           ;; Print nil and t as-is.'
           ((or (eq t value) (eq nil value))
