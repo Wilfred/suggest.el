@@ -1,6 +1,6 @@
 # v0.2
 
-Added some additional functions: `elt`, `butlast`.
+Added some additional functions: `elt`, `butlast`, `make-list`.
 
 Made more the of the `*suggest*` buffer editable, as users often press
 RET at the end of a heading line.

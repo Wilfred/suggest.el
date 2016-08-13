@@ -52,6 +52,7 @@
    #'reverse
    #'append
    #'butlast
+   #'make-list
    ;; Sequence functions
    #'elt
    ;; CL list functions.
