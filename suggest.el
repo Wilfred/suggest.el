@@ -5,7 +5,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.2
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "24.4") (loop "1.3") (dash "2.12.0") (s "1.11.0") (f "0.18.2"))
+;; Package-Requires: ((emacs "24.4") (loop "1.3") (dash "2.13.0") (s "1.11.0") (f "0.18.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
