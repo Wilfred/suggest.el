@@ -107,6 +107,7 @@
    #'assoc
    ;; plist functions
    #'plist-get
+   #'lax-plist-get
    #'plist-member
    ;; hash tables
    #'gethash

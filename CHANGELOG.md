@@ -1,3 +1,7 @@
+# v0.3
+
+Added `lax-plist-get` to suggested functions.
+
 # v0.2
 
 Added some additional functions: `elt`, `butlast`, `make-list`.
