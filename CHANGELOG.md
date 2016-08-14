@@ -1,10 +1,6 @@
-# v0.3
-
-Added `lax-plist-get` to suggested functions.
-
 # v0.2
 
-Added some additional functions: `elt`, `butlast`, `make-list`.
+Added some additional functions: `elt`, `butlast`, `make-list`, `lax-plist-get`.
 
 Made more the of the `*suggest*` buffer editable, as users often press
 RET at the end of a heading line.
