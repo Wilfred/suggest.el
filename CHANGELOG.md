@@ -1,6 +1,7 @@
 # v0.2
 
-Added some additional functions: `elt`, `butlast`, `make-list`, `lax-plist-get`.
+Added some additional functions: `elt`, `butlast`, `make-list`,
+`lax-plist-get`, `abbreviate-file-name`.
 
 Made more the of the `*suggest*` buffer editable, as users often press
 RET at the end of a heading line.
