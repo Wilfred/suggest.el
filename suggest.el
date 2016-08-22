@@ -144,6 +144,7 @@
    #'substring
    #'concat
    #'capitalize
+   #'replace-regexp-in-string
    ;; s.el string functions
    #'s-trim
    #'s-trim-left
