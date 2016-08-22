@@ -40,7 +40,7 @@
 (defvar suggest-functions
   (list
    #'identity
-   ;; Build-in list functions.
+   ;; Built-in list functions.
    #'car
    #'cdr
    #'cadr
