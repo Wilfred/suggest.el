@@ -139,10 +139,14 @@
    #'1+
    #'1-
    ;; Strings
+   #'string
+   #'make-string
+   #'string-to-list
    #'upcase
    #'downcase
    #'substring
    #'concat
+   #'split-string
    #'capitalize
    #'replace-regexp-in-string
    ;; s.el string functions
