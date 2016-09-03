@@ -113,6 +113,9 @@
    #'gethash
    #'hash-table-keys
    #'hash-table-values
+   ;; vectors
+   ;; TODO: there must be more worth using
+   #'vconcat
    ;; Arithmetic
    #'+
    #'-
