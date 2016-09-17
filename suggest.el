@@ -160,6 +160,7 @@
    #'s-collapse-whitespace
    #'s-word-wrap
    #'s-left
+   #'s-right
    #'s-chop-suffix
    #'s-shared-start
    #'s-shared-end
