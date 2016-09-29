@@ -144,7 +144,6 @@
    ;; Strings
    #'string
    #'make-string
-   #'string-to-list
    #'upcase
    #'downcase
    #'substring
@@ -185,6 +184,12 @@
    ;; Symbols
    #'symbol-name
    #'symbol-value
+   ;; Converting between types
+   #'string-to-list
+   #'string-to-number
+   #'string-to-char
+   #'number-to-string
+   #'char-to-string
    ;; Paths
    #'file-name-as-directory
    #'file-name-base
