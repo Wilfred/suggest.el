@@ -12,6 +12,64 @@ on examples. See my blog post:
 
 ![suggest](suggest_screenshot.png)
 
+## Examples
+
+suggest.el knows many string functions:
+
+``` emacs-lisp
+;; Inputs (one per line):
+"foo bar"
+
+;; Desired output:
+"Foo Bar"
+
+;; Suggestions:
+(capitalize "foo bar") ;=> "Foo Bar"
+```
+
+suggest.el can also help you find tricky dash.el functions:
+
+``` emacs-lisp
+;; Inputs (one per line):
+(list 'a 'b 'c 'd)
+'c
+
+;; Desired output:
+2
+
+;; Suggestions:
+(-elem-index 'c (list 'a 'b 'c 'd)) ;=> 2
+```
+
+suggest.el is particularly handy for path manipulation, using both
+built-in functions as well as f.el:
+
+``` emacs-lisp
+;; Inputs (one per line):
+"/foo/bar/baz.txt"
+
+;; Desired output:
+"baz.txt"
+
+;; Suggestions:
+(file-name-nondirectory "/foo/bar/baz.txt") ;=> "baz.txt"
+(f-filename "/foo/bar/baz.txt") ;=> "baz.txt"
+```
+
+It can even suggest calling functions with `apply`:
+
+``` emacs-lisp
+;; Inputs (one per line):
+'(1 2 3 4 5)
+
+;; Desired output:
+15
+
+;; Suggestions:
+(-sum '(1 2 3 4 5)) ;=> 15
+(apply #'+ '(1 2 3 4 5)) ;=> 15
+```
+
 ## How it works
 
 suggest.el tries your inputs (in any order) against every function in
