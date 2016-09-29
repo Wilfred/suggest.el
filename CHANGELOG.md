@@ -4,7 +4,8 @@ Added some additional functions: `elt`, `butlast`, `make-list`,
 `lax-plist-get`, `abbreviate-file-name`, `replace-regexp-in-string`,
 `string`, `make-string`, `split-string`, `string-to-list`, `vconcat`,
 `s-right`, `s-pad-left`, `s-pad-right`, `string-to-number`,
-`string-to-char`, `number-to-string`, `char-to-string`.
+`string-to-char`, `number-to-string`, `char-to-string`,
+`file-name-nondirectory`.
 
 Made more the of the `*suggest*` buffer editable, as users often press
 RET at the end of a heading line.

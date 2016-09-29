@@ -194,6 +194,7 @@
    #'file-name-as-directory
    #'file-name-base
    #'file-name-directory
+   #'file-name-nondirectory
    #'file-name-extension
    #'expand-file-name
    #'abbreviate-file-name
