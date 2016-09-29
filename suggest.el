@@ -156,6 +156,8 @@
    #'s-trim
    #'s-trim-left
    #'s-trim-right
+   #'s-pad-left
+   #'s-pad-right
    #'s-chomp
    #'s-collapse-whitespace
    #'s-word-wrap
