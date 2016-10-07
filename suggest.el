@@ -55,6 +55,7 @@
    #'make-list
    ;; Sequence functions
    #'elt
+   #'aref
    ;; CL list functions.
    #'cl-first
    #'cl-second
