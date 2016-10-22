@@ -1,5 +1,8 @@
 # v0.2
 
+Added examples to the README to help new users understand why they'd
+use suggest.el.
+
 Added some additional functions: `elt`, `butlast`, `make-list`,
 `lax-plist-get`, `abbreviate-file-name`, `replace-regexp-in-string`,
 `string`, `make-string`, `split-string`, `string-to-list`, `vconcat`,
