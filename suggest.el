@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016
 
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
-;; Version: 0.2
+;; Version: 0.3
 ;; Keywords: convenience
 ;; Package-Requires: ((emacs "24.4") (loop "1.3") (dash "2.13.0") (s "1.11.0") (f "0.18.2"))
 ;; URL: https://github.com/Wilfred/suggest.el

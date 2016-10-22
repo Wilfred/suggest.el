@@ -1,3 +1,7 @@
+# v0.3
+
+No changes yet.
+
 # v0.2
 
 Added examples to the README to help new users understand why they'd
