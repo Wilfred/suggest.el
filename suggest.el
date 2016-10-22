@@ -202,6 +202,7 @@
    #'file-name-extension
    #'expand-file-name
    #'abbreviate-file-name
+   #'directory-file-name
    ;; Paths with f.el
    #'f-join
    #'f-split

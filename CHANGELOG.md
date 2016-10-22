@@ -5,7 +5,7 @@ Added some additional functions: `elt`, `butlast`, `make-list`,
 `string`, `make-string`, `split-string`, `string-to-list`, `vconcat`,
 `s-right`, `s-pad-left`, `s-pad-right`, `string-to-number`,
 `string-to-char`, `number-to-string`, `char-to-string`,
-`file-name-nondirectory`, `aref`.
+`file-name-nondirectory`, `directory-file-name`, `aref`.
 
 Made more the of the `*suggest*` buffer editable, as users often press
 RET at the end of a heading line.
