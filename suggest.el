@@ -217,6 +217,7 @@
    #'f-canonical
    #'f-slash
    #'f-depth
+   #'f-relative
    ;; These are not pure, but still safe:
    #'f-files
    #'f-directories
