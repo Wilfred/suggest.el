@@ -1,6 +1,7 @@
 # v0.3
 
-Added `f-relative`.
+Added `f-relative`, `last`, `safe-length`, `remove`, `remq`,
+`number-sequence`, `alist-get`.
 
 # v0.2
 

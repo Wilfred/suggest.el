@@ -43,19 +43,25 @@
 (defvar suggest-functions
   (list
    #'identity
-   ;; Built-in list functions.
+   ;; Built-in functions that access or examine lists.
    #'car
    #'cdr
    #'cadr
    #'cdar
+   #'last
    #'cons
    #'nth
    #'list
    #'length
+   #'safe-length
    #'reverse
+   #'remove
+   #'remq
    #'append
    #'butlast
+   ;; Built-in functions that create lists.
    #'make-list
+   #'number-sequence
    ;; Sequence functions
    #'elt
    #'aref
@@ -109,6 +115,7 @@
    #'-butlast
    ;; alist functions
    #'assoc
+   #'alist-get
    ;; plist functions
    #'plist-get
    #'lax-plist-get
