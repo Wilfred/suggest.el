@@ -1,7 +1,8 @@
 # v0.3
 
 Added `f-relative`, `last`, `safe-length`, `remove`, `remq`,
-`number-sequence`, `alist-get`, `kbd` and `key-description`.
+`number-sequence`, `alist-get`, `ignore`, `symbol-file`,
+`regexp-quote`, `shell-quote-argument`, `kbd` and `key-description`.
 
 # v0.2
 

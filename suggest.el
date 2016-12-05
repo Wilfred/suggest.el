@@ -42,7 +42,6 @@
 ;; See also `cl--simple-funcs' and `cl--safe-funcs'.
 (defvar suggest-functions
   (list
-   #'identity
    ;; Built-in functions that access or examine lists.
    #'car
    #'cdr
@@ -162,6 +161,9 @@
    #'split-string
    #'capitalize
    #'replace-regexp-in-string
+   ;; Quoting strings
+   #'shell-quote-argument
+   #'regexp-quote
    ;; s.el string functions
    #'s-trim
    #'s-trim-left
@@ -195,6 +197,7 @@
    ;; Symbols
    #'symbol-name
    #'symbol-value
+   #'symbol-file
    ;; Converting between types
    #'string-to-list
    #'string-to-number
@@ -232,6 +235,9 @@
    ;; Keyboard codes
    #'kbd
    #'key-description
+   ;; Generic functions
+   #'identity
+   #'ignore
    )
   "Functions that suggest will consider.
 These functions must not produce side effects.
