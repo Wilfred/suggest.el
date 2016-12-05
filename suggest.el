@@ -229,6 +229,9 @@
    #'f-files
    #'f-directories
    #'f-entries
+   ;; Keyboard codes
+   #'kbd
+   #'key-description
    )
   "Functions that suggest will consider.
 These functions must not produce side effects.
