@@ -176,6 +176,9 @@
    #'s-left
    #'s-right
    #'s-chop-suffix
+   #'s-chop-suffixes
+   #'s-chop-prefix
+   #'s-chop-prefixes
    #'s-shared-start
    #'s-shared-end
    #'s-repeat

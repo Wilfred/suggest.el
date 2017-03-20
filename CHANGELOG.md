@@ -1,6 +1,7 @@
 # v0.3
 
-Added `f-relative`, `last`, `safe-length`, `remove`, `remq`,
+Added `s-chop-prefix`, `s-chop-prefixes`, `s-chop-suffixes`,
+`f-relative`, `last`, `safe-length`, `remove`, `remq`,
 `number-sequence`, `alist-get`, `ignore`, `symbol-file`,
 `regexp-quote`, `shell-quote-argument`, `kbd` and `key-description`.
 
