@@ -36,7 +36,6 @@
 (eval-when-compile
   (require 'cl-lib)) ;; cl-incf
 
-;; TODO: add (format %s _) somehow
 ;; TODO: add #'read, but don't prompt for input when the example is nil.
 ;;
 ;; See also `cl--simple-funcs' and `cl--safe-funcs'.
