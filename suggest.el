@@ -200,6 +200,7 @@
    #'symbol-name
    #'symbol-value
    #'symbol-file
+   #'intern
    ;; Converting between types
    #'string-to-list
    #'string-to-number

@@ -3,7 +3,8 @@
 Added `s-chop-prefix`, `s-chop-prefixes`, `s-chop-suffixes`,
 `f-relative`, `last`, `safe-length`, `remove`, `remq`,
 `number-sequence`, `alist-get`, `ignore`, `symbol-file`,
-`regexp-quote`, `shell-quote-argument`, `kbd` and `key-description`.
+`regexp-quote`, `shell-quote-argument`, `kbd`, `key-description`
+and `intern`.
 
 # v0.2
 
