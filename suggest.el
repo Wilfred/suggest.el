@@ -153,12 +153,12 @@
    ;; Strings
    #'string
    #'make-string
-   #'upcase
-   #'downcase
+   ;; #'upcase
+   ;; #'downcase
    #'substring
    #'concat
    #'split-string
-   #'capitalize
+   ;; #'capitalize
    #'replace-regexp-in-string
    ;; Quoting strings
    #'shell-quote-argument
