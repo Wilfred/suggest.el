@@ -451,50 +451,151 @@ SUGGESTIONS is a list of forms."
            (--each remainder-perms (push (cons element it) permutations))))
        (nreverse permutations)))))
 
-(defun suggest--zip (&rest lists)
-  "Zip LISTS together.  Group the head of each list, followed by the
-second elements of each list, and so on. The lengths of the returned
-groupings are equal to the length of the shortest input list.
+;; (suggest--possibilities-1 '("2" "2") '(2 2) 4 1)
+(setq wh/x (suggest--possibilities-1 '("1") '(1.0) 3.0 3))
 
-Unlike dash 2.0, always uses lists."
-  (let (results)
-    (while (-none-p #'null lists)
-      (setq results (cons (mapcar 'car lists) results))
-      (setq lists (mapcar #'cdr lists)))
-    (nreverse results)))
+;; test cases: cdr cdr
+;; 1+ 1+
+;; butlast butlast, butlast -butlast, -butlast butlast, -butlast butlast
+;; (2 3) => 9 using expt
+;; (2 3) => 7 using expt, 1-
+;; funcall with nesting
 
-;; TODO: this would also be a good match for dash.el
-(defun suggest--unzip (lst)
-  "Inverse of `suggest--zip'.
-Assumes all sublists are the same length."
-  (let ((result nil))
-    (dotimes (i (length (-first-item lst)) (nreverse result))
-      (push (-select-column i lst) result))))
+(setq wh/x (-map (lambda (x) (plist-get x :funcs))
+                 (suggest--possibilities-2 '("x") '((a b c d)) '(a b))))
+
+(setq wh/x (reverse (-map (lambda (x) (plist-get x :funcs))
+                          (suggest--possibilities-2 '("x") '(1) 4))))
+
+(setq wh/x (-map (lambda (x) (plist-get x :funcs))
+                 (suggest--possibilities-2 '("x") '((a b c d)) '(c))))
+
+(setq wh/x
+      (reverse (-map (lambda (x) (plist-get x :funcs))
+                     (suggest--possibilities-2 '("x") '((a b c d)) '(c d)))))
+
+(setq wh/x
+      (reverse (-map (lambda (x) (plist-get x :funcs))
+                     (suggest--possibilities-2 '("x") '(0) 3))))
+
+(setq wh/x (-map (lambda (x) (plist-get x :funcs))
+                 (suggest--possibilities-2 '("x") '(1.5) 4.0)))
+
+(defconst suggest--search-depth 4
+  "The maximum number of nested function calls to try.
+This tends to impact performance for values where many functions
+could work, especially numbers.")
+
+(defconst suggest--max-possibilities 20
+  "The maximum number of possibilities to return.
+This has a major impact on performance, and later possibilities
+tend to be progressively more silly.")
+
+(defconst suggest--max-intermediates 10000)
+
+(defun suggest--possibilities-2 (input-literals input-values output)
+  (let (possibilities
+        (possibilities-count 0)
+        this-iteration
+        intermediates
+        (intermediates-count 0))
+    ;; Setup: no function calls, all permutations of our inputs.
+    (setq this-iteration
+          (-map (-lambda ((values . literals))
+                  (list :funcs nil :values values :literals literals))
+                (-zip-pair (suggest--permutations input-values)
+                           (suggest--permutations input-literals))))
+    (catch 'done
+      (dotimes (iteration suggest--search-depth)
+        (catch 'done-iteration
+          (dolist (func suggest-functions)
+            (loop-for-each item this-iteration
+              (let ((literals (plist-get item :literals))
+                    (values (plist-get item :values))
+                    (funcs (plist-get item :funcs))
+                    func-output func-success)
+                ;; Try to evaluate the function.
+                ;; TODO: funcall
+                (ignore-errors
+                  (setq func-output (apply func values))
+                  (setq func-success t))
+
+                (when func-success
+                  (cond
+                   ;; The function gave us the output we wanted, just save it.
+                   ((equal func-output output)
+                    (push
+                     (list :funcs (cons func funcs) :literals literals :values values)
+                     possibilities)
+                    (cl-incf possibilities-count)
+                    (when (> possibilities-count suggest--max-possibilities)
+                      (throw 'done nil))
+                    
+                    ;; If we're on the first iteration, we're just
+                    ;; searching all input permutations. Don't try any
+                    ;; other permutations, or we end up showing e.g. both
+                    ;; (+ 2 3) and (+ 3 2).
+                    (when (zerop iteration)
+                      (loop-break)))
+                   ;; If the function gave us nil, we're not going to
+                   ;; find any interesting values by further exploring
+                   ;; this value.
+                   ((null func-output)
+                    nil)
+                   ;; If the function gave us the identical output as
+                   ;; our input, don't bother exploring further. Too
+                   ;; many functions return the input if they can't do
+                   ;; anything with it.
+                   ((and (equal (length values) 1)
+                         (eq (-first-item values) func-output))
+                    nil)
+                   ;; The function returned a different result to what
+                   ;; we wanted. Build a list of these values so we
+                   ;; can explore them.
+                   (t
+                    (if (< intermediates-count suggest--max-intermediates)
+                        (progn
+                          (push
+                           (list :funcs (cons func funcs) :literals literals :values (list func-output))
+                           intermediates)
+                          (cl-incf intermediates-count))
+                      ;; Avoid building up too big a list of
+                      ;; intermediates. This is especially problematic
+                      ;; when we have many functions that produce the
+                      ;; same result (e.g. small numbers).
+                      ;; TODO deduplicate instead.
+                      (throw 'done-iteration nil)))))))))
+
+        (message "num intemediates: %s" (length intermediates))
+        (setq this-iteration intermediates)
+        (setq intermediates nil)
+        (setq intermediates-count 0)))
+    possibilities))
 
 (defun suggest--possibilities (raw-inputs inputs output)
   "Return a list of possibilities for these INPUTS and OUTPUT.
 Each possbility form uses RAW-INPUTS so we show variables rather
 than their values."
   ;; E.g. ((1 "1") (2 "x"))
-  (let* ((inputs-with-raws (suggest--zip inputs raw-inputs))
+  (let* ((paired-inputs (suggest--zip inputs raw-inputs))
          ;; Each possible ordering of our inputs.
-         (inputs-with-raws-perms (suggest--permutations inputs-with-raws))
+         (inputs-with-raws-perms (suggest--permutations paired-inputs))
          ;; E.g. (((1 2) ("1" "x")) ((2 1) ("x" "1")))
-         (inputs-with-raws-perms-pairwise
+         (inputs-with-literals-orderings-pairwise
           (-map #'suggest--unzip inputs-with-raws-perms))
          (possibilities nil))
     ;; Loop over every function.
     (loop-for-each func suggest-functions
       ;; For every possible input ordering,
-      (loop-for-each inputs-raws-perm inputs-with-raws-perms-pairwise
-        (-let [(inputs-perm raws-perm) inputs-raws-perm]
+      (loop-for-each inputs-raws-perm inputs-with-literals-orderings-pairwise
+        (-let [(values literals) inputs-raws-perm]
           ;; Try to evaluate the function.
           (ignore-errors
-            (let ((func-output (apply func inputs-perm)))
+            (let ((func-output (apply func values)))
               ;; If the function gave us the output we wanted:
               (when (equal func-output output)
                 ;; Save the function with the raw inputs.
-                (push (cons func raws-perm) possibilities)
+                (push (cons func literals) possibilities)
                 ;; Don't try any other input permutations for this
                 ;; function.  This saves us returning multiple results
                 ;; for functions that don't care about ordering, like
