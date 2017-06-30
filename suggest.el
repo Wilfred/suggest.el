@@ -451,35 +451,13 @@ SUGGESTIONS is a list of forms."
            (--each remainder-perms (push (cons element it) permutations))))
        (nreverse permutations)))))
 
-;; (suggest--possibilities-1 '("2" "2") '(2 2) 4 1)
-(setq wh/x (suggest--possibilities-1 '("1") '(1.0) 3.0 3))
-
 ;; test cases: cdr cdr
 ;; 1+ 1+
 ;; butlast butlast, butlast -butlast, -butlast butlast, -butlast butlast
 ;; (2 3) => 9 using expt
 ;; (2 3) => 7 using expt, 1-
 ;; funcall with nesting
-
-(setq wh/x (-map (lambda (x) (plist-get x :funcs))
-                 (suggest--possibilities-2 '("x") '((a b c d)) '(a b))))
-
-(setq wh/x (reverse (-map (lambda (x) (plist-get x :funcs))
-                          (suggest--possibilities-2 '("x") '(1) 4))))
-
-(setq wh/x (-map (lambda (x) (plist-get x :funcs))
-                 (suggest--possibilities-2 '("x") '((a b c d)) '(c))))
-
-(setq wh/x
-      (reverse (-map (lambda (x) (plist-get x :funcs))
-                     (suggest--possibilities-2 '("x") '((a b c d)) '(c d)))))
-
-(setq wh/x
-      (reverse (-map (lambda (x) (plist-get x :funcs))
-                     (suggest--possibilities-2 '("x") '(0) 3))))
-
-(setq wh/x (-map (lambda (x) (plist-get x :funcs))
-                 (suggest--possibilities-2 '("x") '(1.5) 4.0)))
+;; 0 => 3 using 1+ 1+ 1+
 
 (defconst suggest--search-depth 4
   "The maximum number of nested function calls to try.
