@@ -340,17 +340,18 @@ when given negative integers."
   "Open a Suggest buffer that provides suggestions for the inputs
 and outputs given."
   (interactive)
-  (let ((buf (get-buffer-create "*suggest*")))
+  (let ((buf (get-buffer-create "*suggest*"))
+        (inhibit-read-only t))
     (switch-to-buffer buf)
     (erase-buffer)
     (suggest-mode)
-    (let ((inhibit-read-only t))
-      (suggest--insert-heading suggest--inputs-heading)
-      (insert "\n1\n2\n\n")
-      (suggest--insert-heading suggest--outputs-heading)
-      (insert "\n3\n\n")
-      (suggest--insert-heading suggest--results-heading)
-      (insert "\n"))
+
+    (suggest--insert-heading suggest--inputs-heading)
+    (insert "\n1\n2\n\n")
+    (suggest--insert-heading suggest--outputs-heading)
+    (insert "\n3\n\n")
+    (suggest--insert-heading suggest--results-heading)
+    (insert "\n")
     ;; Populate the suggestions for 1, 2 => 3
     (suggest-update)
     ;; Put point on the first input.

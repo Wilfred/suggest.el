@@ -6,6 +6,11 @@
   "Basic test to verify that the suggest command works."
   (suggest))
 
+(ert-deftest suggest-existing-buffer ()
+  "The suggest command should not error when called repeatedly."
+  (suggest)
+  (suggest))
+
 (defmacro should-suggest (&rest inputs-output-form)
   "Given INPUT and OUTPUT, `suggest--possibilities' should propose FORM.
 FORM must use _ for the user's input."
