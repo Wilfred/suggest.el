@@ -41,6 +41,7 @@
 ;; See also `cl--simple-funcs' and `cl--safe-funcs'.
 (defvar suggest-functions
   (list
+   ;; TODO: add funcall, apply and map?
    ;; Built-in functions that access or examine lists.
    #'car
    #'cdr
@@ -252,6 +253,17 @@ the likelihood of users discovering them is too low.
 Likewise, we avoid predicates of one argument, as those generally
 need multiple examples to ensure they do what the user wants.")
 
+(defsubst suggest--safe (fn args)
+  "Is FN safe to call with ARGS?
+Due to Emacs bug #25684, some string functions cause Emacs to segfault
+when given negative integers."
+  (not
+   ;; These functions call caseify_object in casefiddle.c.
+   (and (memq fn '(upcase downcase capitalize upcase-initials))
+        (eq (length args) 1)
+        (integerp (car args))
+        (< (car args) 0))))
+
 (defface suggest-heading
   '((((class color) (background light)) :foreground "DarkGoldenrod4" :weight bold)
     (((class color) (background dark)) :foreground "LightGoldenrod2" :weight bold))
@@ -302,7 +314,7 @@ need multiple examples to ensure they do what the user wants.")
       ;; Skip over empty lines.
       (when (equal it "")
         (loop-continue))
-      (push it raw-inputs))))
+      (push (substring-no-properties it) raw-inputs))))
 
 ;; TODO: check that there's only one line of output, or prevent
 ;; multiple lines being entered.
@@ -328,17 +340,18 @@ need multiple examples to ensure they do what the user wants.")
   "Open a Suggest buffer that provides suggestions for the inputs
 and outputs given."
   (interactive)
-  (let ((buf (get-buffer-create "*suggest*")))
+  (let ((buf (get-buffer-create "*suggest*"))
+        (inhibit-read-only t))
     (switch-to-buffer buf)
     (erase-buffer)
     (suggest-mode)
-    (let ((inhibit-read-only t))
-      (suggest--insert-heading suggest--inputs-heading)
-      (insert "\n1\n2\n\n")
-      (suggest--insert-heading suggest--outputs-heading)
-      (insert "\n3\n\n")
-      (suggest--insert-heading suggest--results-heading)
-      (insert "\n"))
+
+    (suggest--insert-heading suggest--inputs-heading)
+    (insert "\n1\n2\n\n")
+    (suggest--insert-heading suggest--outputs-heading)
+    (insert "\n3\n\n")
+    (suggest--insert-heading suggest--results-heading)
+    (insert "\n")
     ;; Populate the suggestions for 1, 2 => 3
     (suggest-update)
     ;; Put point on the first input.
@@ -380,24 +393,37 @@ N counts from 1."
            lines)))
     (s-join "\n" prefixed-lines)))
 
-;; TODO: why does SUGGESTION get *fontified* strings?
 (defun suggest--format-suggestion (suggestion output)
   "Format SUGGESTION as a lisp expression returning OUTPUT."
-  ;; SUGGESTION is a list that may contain strings, so we can show
-  ;; e.g. #'foo rather than 'foo.
-  (let* ((formatted-suggestion (format "%s" suggestion))
-         ;; A string of spaces the same length as the suggestion.
-         (matching-spaces (s-repeat (length formatted-suggestion) " "))
-         (formatted-output (suggest--format-output output))
-         ;; Append the output to the formatted suggestion. If the
-         ;; output runs over multiple lines, indent appropriately.
-         (formatted-lines
-          (--map-indexed
-           (if (zerop it-index)
-               (format "%s %s" formatted-suggestion it)
-             (format "%s %s" matching-spaces it))
-           (s-lines formatted-output))))
-    (s-join "\n" formatted-lines)))
+  (let ((formatted-call ""))
+    ;; Build up a string "(func1 (func2 ... literal-inputs))"
+    (let ((funcs (plist-get suggestion :funcs))
+          (literals (plist-get suggestion :literals)))
+      (dolist (func funcs)
+        (let ((func-sym (plist-get func :sym))
+              (variadic-p (plist-get func :variadic-p)))
+          (if variadic-p
+              (setq formatted-call
+                    (format "%s(apply #'%s " formatted-call func-sym))
+            (setq formatted-call
+                  (format "%s(%s " formatted-call func-sym)))))
+      (setq formatted-call
+            (format "%s%s" formatted-call
+                    (s-join " " literals)))
+      (setq formatted-call
+            (concat formatted-call (s-repeat (length funcs) ")"))))
+    (let* (;; A string of spaces the same length as the suggestion.
+           (matching-spaces (s-repeat (length formatted-call) " "))
+           (formatted-output (suggest--format-output output))
+           ;; Append the output to the formatted suggestion. If the
+           ;; output runs over multiple lines, indent appropriately.
+           (formatted-lines
+            (--map-indexed
+             (if (zerop it-index)
+                 (format "%s %s" formatted-call it)
+               (format "%s %s" matching-spaces it))
+             (s-lines formatted-output))))
+      (s-join "\n" formatted-lines))))
 
 (defun suggest--write-suggestions (suggestions output)
   "Write SUGGESTIONS to the current *suggest* buffer.
@@ -451,68 +477,147 @@ SUGGESTIONS is a list of forms."
            (--each remainder-perms (push (cons element it) permutations))))
        (nreverse permutations)))))
 
-(defun suggest--zip (&rest lists)
-  "Zip LISTS together.  Group the head of each list, followed by the
-second elements of each list, and so on. The lengths of the returned
-groupings are equal to the length of the shortest input list.
+(defconst suggest--search-depth 4
+  "The maximum number of nested function calls to try.
+This tends to impact performance for values where many functions
+could work, especially numbers.")
 
-Unlike dash 2.0, always uses lists."
-  (let (results)
-    (while (-none-p #'null lists)
-      (setq results (cons (mapcar 'car lists) results))
-      (setq lists (mapcar #'cdr lists)))
-    (nreverse results)))
+(defconst suggest--max-possibilities 20
+  "The maximum number of possibilities to return.
+This has a major impact on performance, and later possibilities
+tend to be progressively more silly.")
 
-;; TODO: this would also be a good match for dash.el
-(defun suggest--unzip (lst)
-  "Inverse of `suggest--zip'.
-Assumes all sublists are the same length."
-  (let ((result nil))
-    (dotimes (i (length (-first-item lst)) (nreverse result))
-      (push (-select-column i lst) result))))
+(defconst suggest--max-intermediates 4000)
 
-(defun suggest--possibilities (raw-inputs inputs output)
-  "Return a list of possibilities for these INPUTS and OUTPUT.
-Each possbility form uses RAW-INPUTS so we show variables rather
+(defsubst suggest--classify-output (inputs func-output target-output)
+  "Classify FUNC-OUTPUT so we can decide whether we should keep it."
+  (cond
+   ((equal func-output target-output)
+    'match)
+   ;; If the function gave us nil, we're not going to
+   ;; find any interesting values by further exploring
+   ;; this value.
+   ((null func-output)
+    'ignore)
+   ;; If the function gave us the same target-output as our
+   ;; input, don't bother exploring further. Too many
+   ;; functions return the input if they can't do
+   ;; anything with it.
+   ((and (equal (length inputs) 1)
+         (equal (-first-item inputs) func-output))
+    'ignore)
+   ;; The function returned a different result to what
+   ;; we wanted, but might be worth exploring further.
+   (t
+    'different)))
+
+(defun suggest--possibilities (input-literals input-values output)
+  "Return a list of possibilities for these INPUTS-VALUES and OUTPUT.
+Each possbility form uses INPUT-LITERALS so we show variables rather
 than their values."
-  ;; E.g. ((1 "1") (2 "x"))
-  (let* ((inputs-with-raws (suggest--zip inputs raw-inputs))
-         ;; Each possible ordering of our inputs.
-         (inputs-with-raws-perms (suggest--permutations inputs-with-raws))
-         ;; E.g. (((1 2) ("1" "x")) ((2 1) ("x" "1")))
-         (inputs-with-raws-perms-pairwise
-          (-map #'suggest--unzip inputs-with-raws-perms))
-         (possibilities nil))
-    ;; Loop over every function.
-    (loop-for-each func suggest-functions
-      ;; For every possible input ordering,
-      (loop-for-each inputs-raws-perm inputs-with-raws-perms-pairwise
-        (-let [(inputs-perm raws-perm) inputs-raws-perm]
-          ;; Try to evaluate the function.
-          (ignore-errors
-            (let ((func-output (apply func inputs-perm)))
-              ;; If the function gave us the output we wanted:
-              (when (equal func-output output)
-                ;; Save the function with the raw inputs.
-                (push (cons func raws-perm) possibilities)
-                ;; Don't try any other input permutations for this
-                ;; function.  This saves us returning multiple results
-                ;; for functions that don't care about ordering, like
-                ;; +.
-                (loop-break))))))
-      ;; If the input is a single list, try calling the function
-      ;; variadically.
-      (when (and
-             (equal (length inputs) 1)
-             (listp (-first-item inputs)))
-        (ignore-errors
-          (let ((func-output (apply func (-first-item inputs))))
-            ;; If the function gave us the output we wanted:
-            (when (equal func-output output)
-              ;; Save the funcall form of calling this function.
-              (push (list 'apply (format "#'%s" func) (-first-item raw-inputs))
-                    possibilities))))))
-    (nreverse possibilities)))
+  (let (possibilities
+        (possibilities-count 0)
+        this-iteration
+        intermediates
+        (intermediates-count 0))
+    ;; Setup: no function calls, all permutations of our inputs.
+    (setq this-iteration
+          (-map (-lambda ((values . literals))
+                  (list :funcs nil :values values :literals literals))
+                (-zip-pair (suggest--permutations input-values)
+                           (suggest--permutations input-literals))))
+    (catch 'done
+      (dotimes (iteration suggest--search-depth)
+        (catch 'done-iteration
+          (dolist (variadic-p '(nil t))
+            (dolist (func suggest-functions)
+              (loop-for-each item this-iteration
+                (let ((literals (plist-get item :literals))
+                      (values (plist-get item :values))
+                      (funcs (plist-get item :funcs))
+                      func-output func-success)
+                  ;; Try to evaluate the function.
+                  (when (suggest--safe func values)
+                    (if variadic-p
+                        ;; See if (apply func values) gives us a value.
+                        (when (and (eq (length values) 1) (listp (car values)))
+                          (ignore-errors
+                            (setq func-output (apply func (car values)))
+                            (setq func-success t)))
+                      ;; See if (func value1 value2...) gives us a value.
+                      (ignore-errors
+                        (setq func-output (apply func values))
+                        (setq func-success t))))
+
+                  (when func-success
+                    (cl-case (suggest--classify-output values func-output output)
+                      ;; The function gave us the output we wanted, just save it.
+                      ('match
+                       (push
+                        (list :funcs (cons (list :sym func :variadic-p variadic-p)
+                                           funcs)
+                              :literals literals :values values)
+                        possibilities)
+                       (cl-incf possibilities-count)
+                       (when (>= possibilities-count suggest--max-possibilities)
+                         (throw 'done nil))
+                       
+                       ;; If we're on the first iteration, we're just
+                       ;; searching all input permutations. Don't try any
+                       ;; other permutations, or we end up showing e.g. both
+                       ;; (+ 2 3) and (+ 3 2).
+                       (when (zerop iteration)
+                         ;; TODO: (throw 'done-func nil)
+                         (loop-break)))
+                      ;; The function returned a different result to what
+                      ;; we wanted. Build a list of these values so we
+                      ;; can explore them.
+                      ('different
+                       (if (< intermediates-count suggest--max-intermediates)
+                           (progn
+                             (push
+                              (list :funcs (cons (list :sym func :variadic-p variadic-p)
+                                                 funcs)
+                                    :literals literals :values (list func-output))
+                              intermediates)
+                             (cl-incf intermediates-count))
+                         ;; Avoid building up too big a list of
+                         ;; intermediates. This is especially problematic
+                         ;; when we have many functions that produce the
+                         ;; same result (e.g. small numbers).
+                         ;; TODO deduplicate instead.
+                         (throw 'done-iteration nil))))))))))
+
+        (setq this-iteration intermediates)
+        (setq intermediates nil)
+        (setq intermediates-count 0)))
+    ;; Return a plist of just :funcs and :literals, as :values is just
+    ;; an internal implementation detail.
+    (-map (lambda (res)
+            (list :funcs (plist-get res :funcs)
+                  :literals (plist-get res :literals)))
+          possibilities)))
+
+(defun suggest--cmp-relevance (pos1 pos2)
+  "Compare two possibilities such that the more relevant result
+  is smaller."
+  ;; We prefer fewer functions, and we prefer simpler functions. We
+  ;; use a dumb but effective heuristic: concatenate the function
+  ;; names and take the shortest.
+  (let* ((get-names (lambda (pos)
+                      (--map (symbol-name (plist-get it :sym))
+                             (plist-get pos :funcs))))
+         (func-names-1 (funcall get-names pos1))
+         (func-names-2 (funcall get-names pos2))
+         (length-1 (length (apply #'concat func-names-1)))
+         (length-2 (length (apply #'concat func-names-2))))
+    ;; Prefer fewer functions first, then concatenat symbol names as a
+    ;; tie breaker.
+    (if (= (length func-names-1)
+           (length func-names-2))
+        (< length-1 length-2)
+      (< (length func-names-1)
+         (length func-names-2)))))
 
 ;;;###autoload
 (defun suggest-update ()
@@ -525,6 +630,11 @@ than their values."
          (desired-output (suggest--read-eval raw-output))
          (possibilities
           (suggest--possibilities raw-inputs inputs desired-output)))
+    ;; Sort, and take the top 5 most relevant results.
+    (setq possibilities
+          (-take 5
+                 (-sort #'suggest--cmp-relevance possibilities)))
+    
     (if possibilities
         (suggest--write-suggestions
          possibilities
