@@ -566,6 +566,23 @@ than their values."
                   :literals (plist-get res :literals)))
           possibilities)))
 
+(defun suggest--cmp-relevance (pos1 pos2)
+  "Compare two possibilities such that the more relevant result
+  is smaller."
+  ;; We prefer fewer functions, and we prefer simpler functions. We
+  ;; use a dumb but effective heuristic: concatenate the function
+  ;; names and take the shortest.
+  (let* ((func-names-1 (-map #'symbol-name (plist-get pos1 :funcs)))
+         (func-names-2 (-map #'symbol-name (plist-get pos2 :funcs)))
+         (length-1 (length (apply #'concat func-names-1)))
+         (length-2 (length (apply #'concat func-names-2))))
+    ;; If the concatenations match, count the number of functions as a
+    ;; tie breaker.
+    (if (equal length-1 length-2)
+        (< (length func-names-1)
+           (length func-names-2))
+      (< length-1 length-2))))
+
 ;;;###autoload
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
@@ -577,6 +594,11 @@ than their values."
          (desired-output (suggest--read-eval raw-output))
          (possibilities
           (suggest--possibilities raw-inputs inputs desired-output)))
+    ;; Sort, and take the top 5 most relevant results.
+    (setq possibilities
+          (-take 5
+                 (-sort #'suggest--cmp-relevance possibilities)))
+    
     (if possibilities
         (suggest--write-suggestions
          possibilities
