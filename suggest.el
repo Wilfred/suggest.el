@@ -302,7 +302,7 @@ need multiple examples to ensure they do what the user wants.")
       ;; Skip over empty lines.
       (when (equal it "")
         (loop-continue))
-      (push it raw-inputs))))
+      (push (substring-no-properties it) raw-inputs))))
 
 ;; TODO: check that there's only one line of output, or prevent
 ;; multiple lines being entered.
@@ -380,7 +380,6 @@ N counts from 1."
            lines)))
     (s-join "\n" prefixed-lines)))
 
-;; TODO: why does SUGGESTION get *fontified* strings?
 (defun suggest--format-suggestion (suggestion output)
   "Format SUGGESTION as a lisp expression returning OUTPUT."
   ;; SUGGESTION is a list that may contain strings, so we can show
