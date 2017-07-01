@@ -618,12 +618,13 @@ than their values."
          (func-names-2 (funcall get-names pos2))
          (length-1 (length (apply #'concat func-names-1)))
          (length-2 (length (apply #'concat func-names-2))))
-    ;; If the concatenations match, count the number of functions as a
+    ;; Prefer fewer functions first, then concatenat symbol names as a
     ;; tie breaker.
-    (if (equal length-1 length-2)
-        (< (length func-names-1)
+    (if (= (length func-names-1)
            (length func-names-2))
-      (< length-1 length-2))))
+        (< length-1 length-2)
+      (< (length func-names-1)
+         (length func-names-2)))))
 
 ;;;###autoload
 (defun suggest-update ()
