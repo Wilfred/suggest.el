@@ -41,6 +41,7 @@
 ;; See also `cl--simple-funcs' and `cl--safe-funcs'.
 (defvar suggest-functions
   (list
+   ;; TODO: add funcall, apply and map?
    ;; Built-in functions that access or examine lists.
    #'car
    #'cdr
