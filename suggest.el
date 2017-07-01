@@ -476,14 +476,6 @@ SUGGESTIONS is a list of forms."
            (--each remainder-perms (push (cons element it) permutations))))
        (nreverse permutations)))))
 
-;; test cases: cdr cdr
-;; 1+ 1+
-;; butlast butlast, butlast -butlast, -butlast butlast, -butlast butlast
-;; (2 3) => 9 using expt
-;; (2 3) => 7 using expt, 1-
-;; funcall with nesting
-;; 0 => 3 using 1+ 1+ 1+
-
 (defconst suggest--search-depth 4
   "The maximum number of nested function calls to try.
 This tends to impact performance for values where many functions
