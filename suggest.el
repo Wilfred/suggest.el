@@ -491,6 +491,28 @@ tend to be progressively more silly.")
 
 (defconst suggest--max-intermediates 10000)
 
+(defsubst suggest--classify-output (inputs func-output target-output)
+  "Classify FUNC-OUTPUT so we can decide whether we should keep it."
+  (cond
+   ((equal func-output target-output)
+    'match)
+   ;; If the function gave us nil, we're not going to
+   ;; find any interesting values by further exploring
+   ;; this value.
+   ((null func-output)
+    'ignore)
+   ;; If the function gave us the same target-output as our
+   ;; input, don't bother exploring further. Too many
+   ;; functions return the input if they can't do
+   ;; anything with it.
+   ((and (equal (length inputs) 1)
+         (equal (-first-item inputs) func-output))
+    'ignore)
+   ;; The function returned a different result to what
+   ;; we wanted, but might be worth exploring further.
+   (t
+    'different)))
+
 (defun suggest--possibilities (input-literals input-values output)
   "Return a list of possibilities for these INPUTS-VALUES and OUTPUT.
 Each possbility form uses INPUT-LITERALS so we show variables rather
@@ -523,50 +545,38 @@ than their values."
                     (setq func-success t)))
 
                 (when func-success
-                  (cond
-                   ;; The function gave us the output we wanted, just save it.
-                   ((equal func-output output)
-                    (push
-                     (list :funcs (cons func funcs) :literals literals :values values)
-                     possibilities)
-                    (cl-incf possibilities-count)
-                    (when (>= possibilities-count suggest--max-possibilities)
-                      (throw 'done nil))
-                    
-                    ;; If we're on the first iteration, we're just
-                    ;; searching all input permutations. Don't try any
-                    ;; other permutations, or we end up showing e.g. both
-                    ;; (+ 2 3) and (+ 3 2).
-                    (when (zerop iteration)
-                      (loop-break)))
-                   ;; If the function gave us nil, we're not going to
-                   ;; find any interesting values by further exploring
-                   ;; this value.
-                   ((null func-output)
-                    nil)
-                   ;; If the function gave us the same output as our
-                   ;; input, don't bother exploring further. Too many
-                   ;; functions return the input if they can't do
-                   ;; anything with it.
-                   ((and (equal (length values) 1)
-                         (equal (-first-item values) func-output))
-                    nil)
-                   ;; The function returned a different result to what
-                   ;; we wanted. Build a list of these values so we
-                   ;; can explore them.
-                   (t
-                    (if (< intermediates-count suggest--max-intermediates)
-                        (progn
-                          (push
-                           (list :funcs (cons func funcs) :literals literals :values (list func-output))
-                           intermediates)
-                          (cl-incf intermediates-count))
-                      ;; Avoid building up too big a list of
-                      ;; intermediates. This is especially problematic
-                      ;; when we have many functions that produce the
-                      ;; same result (e.g. small numbers).
-                      ;; TODO deduplicate instead.
-                      (throw 'done-iteration nil)))))))))
+                  (cl-case (suggest--classify-output values func-output output)
+                    ;; The function gave us the output we wanted, just save it.
+                    ('match
+                     (push
+                      (list :funcs (cons func funcs) :literals literals :values values)
+                      possibilities)
+                     (cl-incf possibilities-count)
+                     (when (>= possibilities-count suggest--max-possibilities)
+                       (throw 'done nil))
+                     
+                     ;; If we're on the first iteration, we're just
+                     ;; searching all input permutations. Don't try any
+                     ;; other permutations, or we end up showing e.g. both
+                     ;; (+ 2 3) and (+ 3 2).
+                     (when (zerop iteration)
+                       (loop-break)))
+                    ;; The function returned a different result to what
+                    ;; we wanted. Build a list of these values so we
+                    ;; can explore them.
+                    ('different
+                     (if (< intermediates-count suggest--max-intermediates)
+                         (progn
+                           (push
+                            (list :funcs (cons func funcs) :literals literals :values (list func-output))
+                            intermediates)
+                           (cl-incf intermediates-count))
+                       ;; Avoid building up too big a list of
+                       ;; intermediates. This is especially problematic
+                       ;; when we have many functions that produce the
+                       ;; same result (e.g. small numbers).
+                       ;; TODO deduplicate instead.
+                       (throw 'done-iteration nil)))))))))
 
         (setq this-iteration intermediates)
         (setq intermediates nil)
