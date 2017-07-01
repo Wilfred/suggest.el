@@ -1,3 +1,7 @@
+# v0.4
+
+No changes yet.
+
 # v0.3
 
 Suggest.el can now suggest sequences of function calls, e.g.
