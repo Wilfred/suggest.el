@@ -154,12 +154,12 @@
    ;; Strings
    #'string
    #'make-string
-   ;; #'upcase
-   ;; #'downcase
+   #'upcase
+   #'downcase
    #'substring
    #'concat
    #'split-string
-   ;; #'capitalize
+   #'capitalize
    #'replace-regexp-in-string
    ;; Quoting strings
    #'shell-quote-argument
@@ -252,6 +252,17 @@ the likelihood of users discovering them is too low.
 
 Likewise, we avoid predicates of one argument, as those generally
 need multiple examples to ensure they do what the user wants.")
+
+(defsubst suggest--safe (fn args)
+  "Is FN safe to call with ARGS?
+Due to Emacs bug #25684, some string functions cause Emacs to segfault
+when given negative integers."
+  (not
+   ;; These functions call caseify_object in casefiddle.c.
+   (and (memq fn '(upcase downcase capitalize upcase-initials))
+        (eq (length args) 1)
+        (integerp (car args))
+        (< (car args) 0))))
 
 (defface suggest-heading
   '((((class color) (background light)) :foreground "DarkGoldenrod4" :weight bold)
@@ -506,9 +517,10 @@ than their values."
                     func-output func-success)
                 ;; Try to evaluate the function.
                 ;; TODO: funcall
-                (ignore-errors
-                  (setq func-output (apply func values))
-                  (setq func-success t))
+                (when (suggest--safe func values)
+                  (ignore-errors
+                    (setq func-output (apply func values))
+                    (setq func-success t)))
 
                 (when func-success
                   (cond
