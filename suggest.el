@@ -532,12 +532,12 @@ than their values."
                    ;; this value.
                    ((null func-output)
                     nil)
-                   ;; If the function gave us the identical output as
-                   ;; our input, don't bother exploring further. Too
-                   ;; many functions return the input if they can't do
+                   ;; If the function gave us the same output as our
+                   ;; input, don't bother exploring further. Too many
+                   ;; functions return the input if they can't do
                    ;; anything with it.
                    ((and (equal (length values) 1)
-                         (eq (-first-item values) func-output))
+                         (equal (-first-item values) func-output))
                     nil)
                    ;; The function returned a different result to what
                    ;; we wanted. Build a list of these values so we
