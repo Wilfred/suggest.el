@@ -399,8 +399,13 @@ N counts from 1."
     (let ((funcs (plist-get suggestion :funcs))
           (literals (plist-get suggestion :literals)))
       (dolist (func funcs)
-        (setq formatted-call
-              (format "%s(%s " formatted-call func)))
+        (let ((func-sym (plist-get func :sym))
+              (variadic-p (plist-get func :variadic-p)))
+          (if variadic-p
+              (setq formatted-call
+                    (format "%s(apply #'%s " formatted-call func-sym))
+            (setq formatted-call
+                  (format "%s(%s " formatted-call func-sym)))))
       (setq formatted-call
             (format "%s%s" formatted-call
                     (s-join " " literals)))
@@ -531,52 +536,64 @@ than their values."
     (catch 'done
       (dotimes (iteration suggest--search-depth)
         (catch 'done-iteration
-          (dolist (func suggest-functions)
-            (loop-for-each item this-iteration
-              (let ((literals (plist-get item :literals))
-                    (values (plist-get item :values))
-                    (funcs (plist-get item :funcs))
-                    func-output func-success)
-                ;; Try to evaluate the function.
-                ;; TODO: funcall
-                (when (suggest--safe func values)
-                  (ignore-errors
-                    (setq func-output (apply func values))
-                    (setq func-success t)))
+          (dolist (variadic-p '(nil t))
+            (dolist (func suggest-functions)
+              (loop-for-each item this-iteration
+                (let ((literals (plist-get item :literals))
+                      (values (plist-get item :values))
+                      (funcs (plist-get item :funcs))
+                      func-output func-success)
+                  ;; Try to evaluate the function.
+                  (when (suggest--safe func values)
+                    (if variadic-p
+                        ;; See if (apply func values) gives us a value.
+                        (when (and (eq (length values) 1) (listp (car values)))
+                          (ignore-errors
+                            (setq func-output (apply func (car values)))
+                            (setq func-success t)))
+                      ;; See if (func value1 value2...) gives us a value.
+                      (ignore-errors
+                        (setq func-output (apply func values))
+                        (setq func-success t))))
 
-                (when func-success
-                  (cl-case (suggest--classify-output values func-output output)
-                    ;; The function gave us the output we wanted, just save it.
-                    ('match
-                     (push
-                      (list :funcs (cons func funcs) :literals literals :values values)
-                      possibilities)
-                     (cl-incf possibilities-count)
-                     (when (>= possibilities-count suggest--max-possibilities)
-                       (throw 'done nil))
-                     
-                     ;; If we're on the first iteration, we're just
-                     ;; searching all input permutations. Don't try any
-                     ;; other permutations, or we end up showing e.g. both
-                     ;; (+ 2 3) and (+ 3 2).
-                     (when (zerop iteration)
-                       (loop-break)))
-                    ;; The function returned a different result to what
-                    ;; we wanted. Build a list of these values so we
-                    ;; can explore them.
-                    ('different
-                     (if (< intermediates-count suggest--max-intermediates)
-                         (progn
-                           (push
-                            (list :funcs (cons func funcs) :literals literals :values (list func-output))
-                            intermediates)
-                           (cl-incf intermediates-count))
-                       ;; Avoid building up too big a list of
-                       ;; intermediates. This is especially problematic
-                       ;; when we have many functions that produce the
-                       ;; same result (e.g. small numbers).
-                       ;; TODO deduplicate instead.
-                       (throw 'done-iteration nil)))))))))
+                  (when func-success
+                    (cl-case (suggest--classify-output values func-output output)
+                      ;; The function gave us the output we wanted, just save it.
+                      ('match
+                       (push
+                        (list :funcs (cons (list :sym func :variadic-p variadic-p)
+                                           funcs)
+                              :literals literals :values values)
+                        possibilities)
+                       (cl-incf possibilities-count)
+                       (when (>= possibilities-count suggest--max-possibilities)
+                         (throw 'done nil))
+                       
+                       ;; If we're on the first iteration, we're just
+                       ;; searching all input permutations. Don't try any
+                       ;; other permutations, or we end up showing e.g. both
+                       ;; (+ 2 3) and (+ 3 2).
+                       (when (zerop iteration)
+                         ;; TODO: (throw 'done-func nil)
+                         (loop-break)))
+                      ;; The function returned a different result to what
+                      ;; we wanted. Build a list of these values so we
+                      ;; can explore them.
+                      ('different
+                       (if (< intermediates-count suggest--max-intermediates)
+                           (progn
+                             (push
+                              (list :funcs (cons (list :sym func :variadic-p variadic-p)
+                                                 funcs)
+                                    :literals literals :values (list func-output))
+                              intermediates)
+                             (cl-incf intermediates-count))
+                         ;; Avoid building up too big a list of
+                         ;; intermediates. This is especially problematic
+                         ;; when we have many functions that produce the
+                         ;; same result (e.g. small numbers).
+                         ;; TODO deduplicate instead.
+                         (throw 'done-iteration nil))))))))))
 
         (setq this-iteration intermediates)
         (setq intermediates nil)
@@ -594,8 +611,11 @@ than their values."
   ;; We prefer fewer functions, and we prefer simpler functions. We
   ;; use a dumb but effective heuristic: concatenate the function
   ;; names and take the shortest.
-  (let* ((func-names-1 (-map #'symbol-name (plist-get pos1 :funcs)))
-         (func-names-2 (-map #'symbol-name (plist-get pos2 :funcs)))
+  (let* ((get-names (lambda (pos)
+                      (--map (symbol-name (plist-get it :sym))
+                             (plist-get pos :funcs))))
+         (func-names-1 (funcall get-names pos1))
+         (func-names-2 (funcall get-names pos2))
          (length-1 (length (apply #'concat func-names-1)))
          (length-2 (length (apply #'concat func-names-2))))
     ;; If the concatenations match, count the number of functions as a
