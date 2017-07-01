@@ -487,7 +487,7 @@ could work, especially numbers.")
 This has a major impact on performance, and later possibilities
 tend to be progressively more silly.")
 
-(defconst suggest--max-intermediates 10000)
+(defconst suggest--max-intermediates 4000)
 
 (defsubst suggest--classify-output (inputs func-output target-output)
   "Classify FUNC-OUTPUT so we can decide whether we should keep it."
