@@ -382,21 +382,30 @@ N counts from 1."
 
 (defun suggest--format-suggestion (suggestion output)
   "Format SUGGESTION as a lisp expression returning OUTPUT."
-  ;; SUGGESTION is a list that may contain strings, so we can show
-  ;; e.g. #'foo rather than 'foo.
-  (let* ((formatted-suggestion (format "%s" suggestion))
-         ;; A string of spaces the same length as the suggestion.
-         (matching-spaces (s-repeat (length formatted-suggestion) " "))
-         (formatted-output (suggest--format-output output))
-         ;; Append the output to the formatted suggestion. If the
-         ;; output runs over multiple lines, indent appropriately.
-         (formatted-lines
-          (--map-indexed
-           (if (zerop it-index)
-               (format "%s %s" formatted-suggestion it)
-             (format "%s %s" matching-spaces it))
-           (s-lines formatted-output))))
-    (s-join "\n" formatted-lines)))
+  (let ((formatted-call ""))
+    ;; Build up a string "(func1 (func2 ... literal-inputs))"
+    (let ((funcs (plist-get suggestion :funcs))
+          (literals (plist-get suggestion :literals)))
+      (dolist (func funcs)
+        (setq formatted-call
+              (format "%s(%s " formatted-call func)))
+      (setq formatted-call
+            (format "%s%s" formatted-call
+                    (s-join " " literals)))
+      (setq formatted-call
+            (concat formatted-call (s-repeat (length funcs) ")"))))
+    (let* (;; A string of spaces the same length as the suggestion.
+           (matching-spaces (s-repeat (length formatted-call) " "))
+           (formatted-output (suggest--format-output output))
+           ;; Append the output to the formatted suggestion. If the
+           ;; output runs over multiple lines, indent appropriately.
+           (formatted-lines
+            (--map-indexed
+             (if (zerop it-index)
+                 (format "%s %s" formatted-call it)
+               (format "%s %s" matching-spaces it))
+             (s-lines formatted-output))))
+      (s-join "\n" formatted-lines))))
 
 (defun suggest--write-suggestions (suggestions output)
   "Write SUGGESTIONS to the current *suggest* buffer.
@@ -470,7 +479,10 @@ tend to be progressively more silly.")
 
 (defconst suggest--max-intermediates 10000)
 
-(defun suggest--possibilities-2 (input-literals input-values output)
+(defun suggest--possibilities (input-literals input-values output)
+  "Return a list of possibilities for these INPUTS-VALUES and OUTPUT.
+Each possbility form uses INPUT-LITERALS so we show variables rather
+than their values."
   (let (possibilities
         (possibilities-count 0)
         this-iteration
@@ -505,7 +517,7 @@ tend to be progressively more silly.")
                      (list :funcs (cons func funcs) :literals literals :values values)
                      possibilities)
                     (cl-incf possibilities-count)
-                    (when (> possibilities-count suggest--max-possibilities)
+                    (when (>= possibilities-count suggest--max-possibilities)
                       (throw 'done nil))
                     
                     ;; If we're on the first iteration, we're just
@@ -543,54 +555,15 @@ tend to be progressively more silly.")
                       ;; TODO deduplicate instead.
                       (throw 'done-iteration nil)))))))))
 
-        (message "num intemediates: %s" (length intermediates))
         (setq this-iteration intermediates)
         (setq intermediates nil)
         (setq intermediates-count 0)))
-    possibilities))
-
-(defun suggest--possibilities (raw-inputs inputs output)
-  "Return a list of possibilities for these INPUTS and OUTPUT.
-Each possbility form uses RAW-INPUTS so we show variables rather
-than their values."
-  ;; E.g. ((1 "1") (2 "x"))
-  (let* ((paired-inputs (suggest--zip inputs raw-inputs))
-         ;; Each possible ordering of our inputs.
-         (inputs-with-raws-perms (suggest--permutations paired-inputs))
-         ;; E.g. (((1 2) ("1" "x")) ((2 1) ("x" "1")))
-         (inputs-with-literals-orderings-pairwise
-          (-map #'suggest--unzip inputs-with-raws-perms))
-         (possibilities nil))
-    ;; Loop over every function.
-    (loop-for-each func suggest-functions
-      ;; For every possible input ordering,
-      (loop-for-each inputs-raws-perm inputs-with-literals-orderings-pairwise
-        (-let [(values literals) inputs-raws-perm]
-          ;; Try to evaluate the function.
-          (ignore-errors
-            (let ((func-output (apply func values)))
-              ;; If the function gave us the output we wanted:
-              (when (equal func-output output)
-                ;; Save the function with the raw inputs.
-                (push (cons func literals) possibilities)
-                ;; Don't try any other input permutations for this
-                ;; function.  This saves us returning multiple results
-                ;; for functions that don't care about ordering, like
-                ;; +.
-                (loop-break))))))
-      ;; If the input is a single list, try calling the function
-      ;; variadically.
-      (when (and
-             (equal (length inputs) 1)
-             (listp (-first-item inputs)))
-        (ignore-errors
-          (let ((func-output (apply func (-first-item inputs))))
-            ;; If the function gave us the output we wanted:
-            (when (equal func-output output)
-              ;; Save the funcall form of calling this function.
-              (push (list 'apply (format "#'%s" func) (-first-item raw-inputs))
-                    possibilities))))))
-    (nreverse possibilities)))
+    ;; Return a plist of just :funcs and :literals, as :values is just
+    ;; an internal implementation detail.
+    (-map (lambda (res)
+            (list :funcs (plist-get res :funcs)
+                  :literals (plist-get res :literals)))
+          possibilities)))
 
 ;;;###autoload
 (defun suggest-update ()
