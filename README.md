@@ -70,6 +70,21 @@ It can even suggest calling functions with `apply`:
 (apply #'+ '(1 2 3 4 5)) ;=> 15
 ```
 
+It can also suggest composing functions:
+
+``` emacs-lisp
+;; Inputs (one per line):
+'(a b c)
+
+;; Desired output:
+'c
+
+;; Suggestions:
+(cadr (cdr '(a b c))) ;=> 'c
+(car (last '(a b c))) ;=> 'c
+(cl-third '(a b c)) ;=> 'c
+```
+
 ## How it works
 
 suggest.el tries your inputs (in any order) against every function in
