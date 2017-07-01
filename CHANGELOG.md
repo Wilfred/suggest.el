@@ -1,5 +1,12 @@
 # v0.3
 
+Suggest.el can now suggest sequences of function calls, e.g.
+`(cdr (cdr foo))`.
+
+Suggest.el now avoids calling some string functions with arguments
+that are known to segfault Emacs
+([#16](https://github.com/Wilfred/suggest.el/issues/16)).
+
 Added `s-chop-prefix`, `s-chop-prefixes`, `s-chop-suffixes`,
 `f-relative`, `last`, `safe-length`, `remove`, `remq`,
 `number-sequence`, `alist-get`, `ignore`, `symbol-file`,
