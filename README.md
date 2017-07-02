@@ -106,6 +106,10 @@ example, [cant for Python](https://github.com/kootenpv/cant) tries
 every function in scope (without a safety whitelist) to find
 functionality.
 
+barliman takes this idea of synthesis much, much further for
+Scheme. There's an
+[incredible demo video here](https://www.youtube.com/watch?v=er_lLvkklsk).
+
 ## License
 
 GPLv3.
