@@ -654,7 +654,6 @@ than their values."
   "Update the suggestions heading to say whether we need
 the user to call `suggest-update'."
   (save-excursion
-    (goto-char (point-min))
     (suggest--nth-heading 3)
     (let ((inhibit-read-only t))
       (delete-region (point) (progn (move-end-of-line nil) (point)))
