@@ -328,8 +328,7 @@ when given negative integers."
     (while (looking-at "\n")
       (forward-line 1))
     ;; Return the current line.
-    (buffer-substring (point)
-                      (progn (move-end-of-line nil) (point)))))
+    (buffer-substring (point) (line-end-position))))
 
 (defun suggest--keybinding (command keymap)
   "Find the keybinding for COMMAND in KEYMAP."
@@ -656,7 +655,7 @@ the user to call `suggest-update'."
   (save-excursion
     (suggest--nth-heading 3)
     (let ((inhibit-read-only t))
-      (delete-region (point) (progn (move-end-of-line nil) (point)))
+      (delete-region (point) (line-end-position))
       (if update-needed
           (suggest--insert-heading
            (format ";; Suggestions (press %s to update):"
