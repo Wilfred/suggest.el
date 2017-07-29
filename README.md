@@ -97,21 +97,102 @@ pure functions with a small number of arguments using only simple data
 types. We only include functions that users could 'stumble upon' with
 the right set of inputs.
 
+## License
+
+GPLv3.
+
 ## Related projects
+
+Program synthesis or inductive programming is a computer science
+research topic, with a range of tools taking very different approaches
+to generate code.
+
+### Smalltalk: Finder
 
 This project was inspired by the Finder in Smalltalk, which does
 something similar. There's
 [a great demo video here](https://www.youtube.com/watch?v=HOuZyOKa91o#t=5m05s).
+
+You give a list of values (inputs followed by an output):
+
+```
+3. 4. 7.
+```
+
+The Finder iterates over all possible calls (with arguments in any
+order) to a list of known safe messages, and returns suggestions:
+
+```
+3 + 4 --> 7
+3 bitOr: 4 --> 7
+3 bitXor: 4 --> 7
+3 | 4 --> 7
+```
+
+This only returns single messages that meet the requirements, no
+nesting (e.g. it won't find `'(data1 reversed asUppercase)'` from
+`'foo'. 'OOF'`).
+
+You can also supply multiple examples, using expressions as inputs:
+
+```
+MethodFinder methodFor: { {'29 Apr 1999' asDate}. 'Thursday'.
+		{'30 Apr 1999' asDate}. 'Friday' }.
+```
+
+This returns `'(data1 weekday)'`.
+
+Amusingly, it will sometimes find `'(data1 shuffled)'` from
+`'fo'. 'of'.`, which is a random sort.
+
+### Python: cant
 
 There are some other niche tools that take other approaches. For
 example, [cant for Python](https://github.com/kootenpv/cant) tries
 every function in scope (without a safety whitelist) to find
 functionality.
 
+### Scheme: barliman
+
 barliman takes this idea of synthesis much, much further for
 Scheme. There's an
 [incredible demo video here](https://www.youtube.com/watch?v=er_lLvkklsk).
 
-## License
+### C-like: sketch
 
-GPLv3.
+[sketch](https://bitbucket.org/gatoatigrado/sketch-frontend/wiki/Home)
+allows the user to specify value placeholders in code
+([examples](https://bitbucket.org/gatoatigrado/sketch-frontend/wiki/Gallery)).
+
+```
+harness void doubleSketch(int x){
+  int t = x * ??;
+  assert t == x + x;
+}
+```
+
+Generally you provide the structure of the code.
+
+```
+bit[W] firstLeadingZeroSketch (bit[W] x) implements firstLeadingZero {	
+	return !(x + ??) & (x + ??); 
+}
+```
+
+Or you can specify a set of operators for sketch to explore. Each line
+here is an assignment to `x` or `tmp` of an expression that may
+contain `!` `&` `+` with `x`, `tmp` or a constant as arguments.
+
+```
+bit[W] firstLeadingZeroSketch (bit[W] x) implements firstLeadingZero {	
+	bit[W] tmp=0;
+       {| x | tmp |} = {| (!)?((x | tmp) (& | +) (x | tmp | ??)) |};
+       {| x | tmp |} = {| (!)?((x | tmp) (& | +) (x | tmp | ??)) |};
+       {| x | tmp |} = {| (!)?((x | tmp) (& | +) (x | tmp | ??)) |};
+       return tmp;
+}
+```
+
+Constraints are fed to a SAT solver, then sketch finds a solution. The
+output can be converted to C.
+
