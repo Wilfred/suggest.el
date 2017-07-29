@@ -151,6 +151,12 @@
    #'ftruncate
    #'1+
    #'1-
+   ;; Logical operators
+   #'lsh
+   #'logand
+   #'logior
+   #'logxor
+   #'lognot
    ;; Strings
    #'string
    #'make-string
