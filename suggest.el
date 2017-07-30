@@ -517,6 +517,34 @@ tend to be progressively more silly.")
    (t
     'different)))
 
+(defun suggest--call (func values &optional variadic-p)
+  "Call FUNC with VALUES, ignoring all errors.
+If FUNC returns a value, return a plist (:output ...). Returns
+nil otherwise."
+  (when (suggest--safe func values)
+    (let (func-output func-success)
+      (ignore-errors
+        (setq func-output
+              (if variadic-p
+                  (apply func (car values))
+                (apply func values)))
+        (setq func-success t))
+      (when func-success
+        (list :output func-output :variadic-p variadic-p)))))
+
+(defun suggest--try-call (func input-values)
+  "Try to call FUNC with INPUT-VALUES, and return a list of outputs"
+  (let (outputs)
+    ;; See if (func value1 value2...) gives us a value.
+    (-when-let (result (suggest--call func input-values))
+      (push result outputs))
+    
+    ;; See if (apply func input-values) gives us a value.
+    (when (and (eq (length input-values) 1) (listp (car input-values)))
+      (-when-let (result (suggest--call func input-values t))
+        (push result outputs)))
+    outputs))
+
 (defun suggest--possibilities (input-literals input-values output)
   "Return a list of possibilities for these INPUTS-VALUES and OUTPUT.
 Each possbility form uses INPUT-LITERALS so we show variables rather
@@ -535,32 +563,20 @@ than their values."
     (catch 'done
       (dotimes (iteration suggest--search-depth)
         (catch 'done-iteration
-          (dolist (variadic-p '(nil t))
-            (dolist (func suggest-functions)
-              (loop-for-each item this-iteration
-                (let ((literals (plist-get item :literals))
-                      (values (plist-get item :values))
-                      (funcs (plist-get item :funcs))
-                      func-output func-success)
-                  ;; Try to evaluate the function.
-                  (when (suggest--safe func values)
-                    (if variadic-p
-                        ;; See if (apply func values) gives us a value.
-                        (when (and (eq (length values) 1) (listp (car values)))
-                          (ignore-errors
-                            (setq func-output (apply func (car values)))
-                            (setq func-success t)))
-                      ;; See if (func value1 value2...) gives us a value.
-                      (ignore-errors
-                        (setq func-output (apply func values))
-                        (setq func-success t))))
-
-                  (when func-success
+          (dolist (func suggest-functions)
+            (loop-for-each item this-iteration
+              (let ((literals (plist-get item :literals))
+                    (values (plist-get item :values))
+                    (funcs (plist-get item :funcs)))
+                ;; Try to call the function, then classify its return values.
+                (dolist (func-result (suggest--try-call func values))
+                  (let ((func-output (plist-get func-result :output)))
                     (cl-case (suggest--classify-output values func-output output)
                       ;; The function gave us the output we wanted, just save it.
                       ('match
                        (push
-                        (list :funcs (cons (list :sym func :variadic-p variadic-p)
+                        (list :funcs (cons (list :sym func
+                                                 :variadic-p (plist-get output :variadic-p))
                                            funcs)
                               :literals literals :values values)
                         possibilities)
@@ -582,7 +598,8 @@ than their values."
                        (if (< intermediates-count suggest--max-intermediates)
                            (progn
                              (push
-                              (list :funcs (cons (list :sym func :variadic-p variadic-p)
+                              (list :funcs (cons (list :sym func
+                                                       :variadic-p (plist-get output :variadic-p))
                                                  funcs)
                                     :literals literals :values (list func-output))
                               intermediates)
