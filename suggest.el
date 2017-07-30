@@ -1,6 +1,6 @@
 ;;; suggest.el --- suggest elisp functions that give the output requested  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2016
+;; Copyright (C) 2017
 
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.4
