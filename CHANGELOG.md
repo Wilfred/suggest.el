@@ -1,6 +1,7 @@
 # v0.4
 
-No changes yet.
+Added bitwise functions `lsh`, `logand`, `logior`, `logxor`, and
+`lognot`.
 
 # v0.3
 
