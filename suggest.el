@@ -203,6 +203,7 @@
    #'s-reverse
    #'s-count-matches
    #'s-split-words
+   #'s-wrap
    ;; Symbols
    #'symbol-name
    #'symbol-value

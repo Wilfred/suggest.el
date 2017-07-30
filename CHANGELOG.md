@@ -3,6 +3,8 @@
 Added bitwise functions `lsh`, `logand`, `logior`, `logxor`, and
 `lognot`.
 
+Added string function `s-wrap`.
+
 # v0.3
 
 Suggest.el can now suggest sequences of function calls, e.g.
