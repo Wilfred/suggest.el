@@ -196,3 +196,23 @@ bit[W] firstLeadingZeroSketch (bit[W] x) implements firstLeadingZero {
 Constraints are fed to a SAT solver, then sketch finds a solution. The
 output can be converted to C.
 
+### Liquid Haskell: Synquid
+
+[Synquid](https://bitbucket.org/nadiapolikarpova/synquid) (the first
+half of
+[this Microsoft Research talk](https://www.youtube.com/watch?v=Q-3tcbUyF34) gives
+a good overview) is a program synthesis tool leveraging refinement
+types.
+
+The user provides the type of the function they want to generate, and
+a collection of 'components', the building blocks that Synquid tries
+to combine.
+
+Synquid then lazily generates ASTs and type checks them. This allows
+it to prune the search tree by ignoring program structures that are
+never valid types.
+
+(This is the extent of my understanding: I have probably
+oversimplified.)
+
+Impressively, Synquid can generate recursive functions.
