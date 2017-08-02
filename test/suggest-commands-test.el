@@ -30,9 +30,6 @@ FORM must use _ for the user's input."
         (member expected-call possibilities-funcs-syms)))))
 
 (ert-deftest suggest-possibilities ()
-  ;; A particularly deep search.
-  (should-suggest 0 => 3
-                  (1+ (1+ (1+ _))))
   ;; Ensure we offer built-in list functions.
   (should-suggest '(a b c d) => '(c d)
                   (cdr (cdr _)))
