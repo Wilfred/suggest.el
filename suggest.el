@@ -553,12 +553,16 @@ nil otherwise."
 
     ;; See if (func COMMON-CONSTANT value1 value2...) gives us a value.
     (when (zerop iteration)
-      (dolist (extra-arg (list nil 0 1 2))
-        (-when-let (result (suggest--call
-                            func
-                            (cons extra-arg input-values)
-                            (cons (format "%S" extra-arg) input-literals)))
-          (push result outputs))))
+      (dolist (extra-arg (list nil -1 0 1 2))
+        (dolist (position '(before after))
+          (let ((args (if (eq position 'before)
+                          (cons extra-arg input-values)
+                        (-snoc input-values extra-arg)))
+                (literals (if (eq position 'before)
+                              (cons (format "%S" extra-arg) input-literals)
+                            (-snoc input-literals (format "%S" extra-arg)))))
+            (-when-let (result (suggest--call func args literals))
+              (push result outputs))))))
     ;; Return results in ascending order of preference, so we prefer
     ;; (+ 1 2) over (+ 0 1 2).
     (nreverse outputs)))
