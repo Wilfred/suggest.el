@@ -12,6 +12,8 @@ Added bitwise functions `lsh`, `logand`, `logior`, `logxor`, and
 
 Added string function `s-wrap`.
 
+Fixed crash on repeated `M-x suggest`.
+
 # v0.3
 
 Suggest.el can now suggest sequences of function calls, e.g.

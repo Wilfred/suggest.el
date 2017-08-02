@@ -348,7 +348,8 @@ when given negative integers."
 and outputs given."
   (interactive)
   (let ((buf (get-buffer-create "*suggest*"))
-        (inhibit-read-only t))
+        (inhibit-read-only t)
+        (inhibit-modification-hooks t))
     (switch-to-buffer buf)
     (erase-buffer)
     (suggest-mode)
