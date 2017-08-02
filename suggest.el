@@ -520,7 +520,7 @@ tend to be progressively more silly.")
    (t
     'different)))
 
-(defsubst suggest--call (func values &optional variadic-p)
+(defsubst suggest--call (func values literals &optional variadic-p)
   "Call FUNC with VALUES, ignoring all errors.
 If FUNC returns a value, return a plist (:output ...). Returns
 nil otherwise."
@@ -535,20 +535,33 @@ nil otherwise."
                 (apply func values)))
         (setq func-success t))
       (when func-success
-        (list :output func-output :variadic-p variadic-p)))))
+        (list :output func-output
+              :variadic-p variadic-p
+              :literals literals)))))
 
-(defun suggest--try-call (func input-values)
+(defun suggest--try-call (iteration func input-values input-literals)
   "Try to call FUNC with INPUT-VALUES, and return a list of outputs"
   (let (outputs)
     ;; See if (func value1 value2...) gives us a value.
-    (-when-let (result (suggest--call func input-values))
+    (-when-let (result (suggest--call func input-values input-literals))
       (push result outputs))
     
     ;; See if (apply func input-values) gives us a value.
     (when (and (eq (length input-values) 1) (listp (car input-values)))
-      (-when-let (result (suggest--call func input-values t))
+      (-when-let (result (suggest--call func input-values input-literals t))
         (push result outputs)))
-    outputs))
+
+    ;; See if (func COMMON-CONSTANT value1 value2...) gives us a value.
+    (when (zerop iteration)
+      (dolist (extra-arg (list nil 0 1 2))
+        (-when-let (result (suggest--call
+                            func
+                            (cons extra-arg input-values)
+                            (cons (format "%S" extra-arg) input-literals)))
+          (push result outputs))))
+    ;; Return results in ascending order of preference, so we prefer
+    ;; (+ 1 2) over (+ 0 1 2).
+    (nreverse outputs)))
 
 (defun suggest--possibilities (input-literals input-values output)
   "Return a list of possibilities for these INPUTS-VALUES and OUTPUT.
@@ -575,7 +588,7 @@ than their values."
                     (values (plist-get item :values))
                     (funcs (plist-get item :funcs)))
                 ;; Try to call the function, then classify its return values.
-                (dolist (func-result (suggest--try-call func values))
+                (dolist (func-result (suggest--try-call iteration func values literals))
                   (let ((func-output (plist-get func-result :output)))
                     (cl-case (suggest--classify-output values func-output output)
                       ;; The function gave us the output we wanted, just save it.
@@ -584,7 +597,7 @@ than their values."
                         (list :funcs (cons (list :sym func
                                                  :variadic-p (plist-get func-result :variadic-p))
                                            funcs)
-                              :literals literals :values values)
+                              :literals (plist-get func-result :literals))
                         possibilities)
                        (cl-incf possibilities-count)
                        (when (>= possibilities-count suggest--max-possibilities)
@@ -614,7 +627,8 @@ than their values."
                           (list :funcs (cons (list :sym func
                                                    :variadic-p (plist-get output :variadic-p))
                                              funcs)
-                                :literals literals :values (list func-output))
+                                :literals (plist-get func-result :literals)
+                                :values (list func-output))
                           intermediates))))))))))
 
         (setq this-iteration intermediates)
