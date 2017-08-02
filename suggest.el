@@ -260,7 +260,7 @@ the likelihood of users discovering them is too low.
 Likewise, we avoid predicates of one argument, as those generally
 need multiple examples to ensure they do what the user wants.")
 
-(defsubst suggest--safe (fn args)
+(defun suggest--safe (fn args)
   "Is FN safe to call with ARGS?
 Due to Emacs bug #25684, some string functions cause Emacs to segfault
 when given negative integers."
@@ -518,7 +518,7 @@ tend to be progressively more silly.")
    (t
     'different)))
 
-(defun suggest--call (func values &optional variadic-p)
+(defsubst suggest--call (func values &optional variadic-p)
   "Call FUNC with VALUES, ignoring all errors.
 If FUNC returns a value, return a plist (:output ...). Returns
 nil otherwise."
