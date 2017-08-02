@@ -613,8 +613,8 @@ than their values."
 
         (setq this-iteration intermediates)
         (setq intermediates nil)))
-    ;; Return a plist of just :funcs and :literals, as :values is just
-    ;; an internal implementation detail.
+    ;; Return a plist of just :funcs and :literals, which is all we
+    ;; need to render the result.
     (-map (lambda (res)
             (list :funcs (plist-get res :funcs)
                   :literals (plist-get res :literals)))
