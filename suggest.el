@@ -493,7 +493,7 @@ could work, especially numbers.")
 This has a major impact on performance, and later possibilities
 tend to be progressively more silly.")
 
-(defconst suggest--max-intermediates 4000)
+(defconst suggest--max-per-value 3)
 
 (defsubst suggest--classify-output (inputs func-output target-output)
   "Classify FUNC-OUTPUT so we can decide whether we should keep it."
@@ -553,7 +553,7 @@ than their values."
         (possibilities-count 0)
         this-iteration
         intermediates
-        (intermediates-count 0))
+        (value-occurrences (make-hash-table :test #'equal)))
     ;; Setup: no function calls, all permutations of our inputs.
     (setq this-iteration
           (-map (-lambda ((values . literals))
@@ -595,25 +595,21 @@ than their values."
                       ;; we wanted. Build a list of these values so we
                       ;; can explore them.
                       ('different
-                       (if (< intermediates-count suggest--max-intermediates)
-                           (progn
-                             (push
-                              (list :funcs (cons (list :sym func
-                                                       :variadic-p (plist-get output :variadic-p))
-                                                 funcs)
-                                    :literals literals :values (list func-output))
-                              intermediates)
-                             (cl-incf intermediates-count))
-                         ;; Avoid building up too big a list of
-                         ;; intermediates. This is especially problematic
-                         ;; when we have many functions that produce the
-                         ;; same result (e.g. small numbers).
-                         ;; TODO deduplicate instead.
-                         (throw 'done-iteration nil))))))))))
+                       (when (< (gethash func-output value-occurrences 0)
+                                suggest--max-per-value)
+                         (puthash
+                          func-output
+                          (1+ (gethash func-output value-occurrences 0))
+                          value-occurrences)
+                         (push
+                          (list :funcs (cons (list :sym func
+                                                   :variadic-p (plist-get output :variadic-p))
+                                             funcs)
+                                :literals literals :values (list func-output))
+                          intermediates))))))))))
 
         (setq this-iteration intermediates)
-        (setq intermediates nil)
-        (setq intermediates-count 0)))
+        (setq intermediates nil)))
     ;; Return a plist of just :funcs and :literals, as :values is just
     ;; an internal implementation detail.
     (-map (lambda (res)
