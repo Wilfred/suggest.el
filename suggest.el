@@ -494,6 +494,8 @@ could work, especially numbers.")
 This has a major impact on performance, and later possibilities
 tend to be progressively more silly.")
 
+(defconst suggest--max-intermediates 200)
+
 (defconst suggest--max-per-value 3)
 
 (defsubst suggest--classify-output (inputs func-output target-output)
@@ -556,6 +558,7 @@ than their values."
         (possibilities-count 0)
         this-iteration
         intermediates
+        (intermediates-count 0)
         (value-occurrences (make-hash-table :test #'equal)))
     ;; Setup: no function calls, all permutations of our inputs.
     (setq this-iteration
@@ -598,12 +601,15 @@ than their values."
                       ;; we wanted. Build a list of these values so we
                       ;; can explore them.
                       ('different
-                       (when (< (gethash func-output value-occurrences 0)
-                                suggest--max-per-value)
+                       (when  (and
+                               (< intermediates-count suggest--max-intermediates)
+                               (< (gethash func-output value-occurrences 0)
+                                  suggest--max-per-value))
                          (puthash
                           func-output
                           (1+ (gethash func-output value-occurrences 0))
                           value-occurrences)
+                         (cl-incf intermediates-count)
                          (push
                           (list :funcs (cons (list :sym func
                                                    :variadic-p (plist-get output :variadic-p))
@@ -612,7 +618,8 @@ than their values."
                           intermediates))))))))))
 
         (setq this-iteration intermediates)
-        (setq intermediates nil)))
+        (setq intermediates nil)
+        (setq intermediates-count 0)))
     ;; Return a plist of just :funcs and :literals, which is all we
     ;; need to render the result.
     (-map (lambda (res)
