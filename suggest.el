@@ -267,7 +267,8 @@ when given negative integers."
   (not
    ;; These functions call caseify_object in casefiddle.c.
    (and (memq fn '(upcase downcase capitalize upcase-initials))
-        (eq (length args) 1)
+        (consp args)
+        (null (cdr args))
         (integerp (car args))
         (< (car args) 0))))
 
@@ -521,7 +522,9 @@ tend to be progressively more silly.")
   "Call FUNC with VALUES, ignoring all errors.
 If FUNC returns a value, return a plist (:output ...). Returns
 nil otherwise."
-  (when (suggest--safe func values)
+  (when (suggest--safe func (if variadic-p
+                                (car values)
+                              values))
     (let (func-output func-success)
       (ignore-errors
         (setq func-output
