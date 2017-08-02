@@ -1,5 +1,12 @@
 # v0.4
 
+The search algorithm is now smarter at avoiding previoiusly-seen
+values, resulting in a larger search space being explored. You may see
+additional suggestions.
+
+suggest.el may now suggest additional arguments, e.g. it can suggest
+`(nth 0 '(1 2 3))` from just `'(1 2 3)` as an input.
+
 Added bitwise functions `lsh`, `logand`, `logior`, `logxor`, and
 `lognot`.
 

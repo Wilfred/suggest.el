@@ -87,6 +87,24 @@ It can also suggest composing functions:
 (cl-third '(a b c)) ;=> 'c
 ```
 
+It will also suggest additional arguments of basic values (0 in this
+example):
+
+``` emacs-lisp
+;; Inputs (one per line):
+'(a b c d)
+
+;; Desired output:
+'a
+
+;; Suggestions:
+(elt '(a b c d) 0) ;=> 'a
+(nth 0 '(a b c d)) ;=> 'a
+(car '(a b c d)) ;=> 'a
+(cl-first '(a b c d)) ;=> 'a
+(-first-item '(a b c d)) ;=> 'a
+```
+
 ## How it works
 
 suggest.el tries your inputs (in any order) against every function in
