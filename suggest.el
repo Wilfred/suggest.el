@@ -579,7 +579,7 @@ than their values."
                       ('match
                        (push
                         (list :funcs (cons (list :sym func
-                                                 :variadic-p (plist-get output :variadic-p))
+                                                 :variadic-p (plist-get func-result :variadic-p))
                                            funcs)
                               :literals literals :values values)
                         possibilities)
