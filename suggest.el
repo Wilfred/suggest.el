@@ -652,20 +652,27 @@ than their values."
   ;; We prefer fewer functions, and we prefer simpler functions. We
   ;; use a dumb but effective heuristic: concatenate the function
   ;; names and take the shortest.
-  (let* ((get-names (lambda (pos)
-                      (--map (symbol-name (plist-get it :sym))
-                             (plist-get pos :funcs))))
-         (func-names-1 (funcall get-names pos1))
-         (func-names-2 (funcall get-names pos2))
-         (length-1 (length (apply #'concat func-names-1)))
-         (length-2 (length (apply #'concat func-names-2))))
-    ;; Prefer fewer functions first, then concatenat symbol names as a
-    ;; tie breaker.
-    (if (= (length func-names-1)
-           (length func-names-2))
-        (< length-1 length-2)
-      (< (length func-names-1)
-         (length func-names-2)))))
+  (cond
+   ;; If we have the same number of function calls, with the same
+   ;; number of arguments, prefer functions with shorter names.
+   ((and
+     (= (length (plist-get pos1 :funcs)) (length (plist-get pos2 :funcs)))
+     (= (length (plist-get pos1 :literals)) (length (plist-get pos2 :literals))))
+    (let ((join-names (lambda (pos)
+                        (->> (plist-get pos :funcs)
+                             (--map (plist-get it :sym))
+                             (-map #'symbol-name)
+                             (apply #'concat)))))
+      (< (length (funcall join-names pos1)) (length (funcall join-names pos2)))))
+
+   ;; Prefer calls that don't have extra arguments, so prefer (1+ 1)
+   ;; over (+ 1 1).
+   ((= (length (plist-get pos1 :funcs)) (length (plist-get pos2 :funcs)))
+    (< (length (plist-get pos1 :literals)) (length (plist-get pos2 :literals))))
+
+   ;; Prefer fewer function calls over all else.
+   (t
+    (< (length (plist-get pos1 :funcs)) (length (plist-get pos2 :funcs))))))
 
 ;;;###autoload
 (defun suggest-update ()

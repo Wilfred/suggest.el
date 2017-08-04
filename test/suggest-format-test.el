@@ -30,3 +30,29 @@
   (should
    (equal
     (suggest--format-output "foo\nbar") ";=> \"foo\n;   bar\"")))
+
+(ert-deftest suggest-cmp ()
+  (let ((add-constant '(:funcs ((:sym + :variadic-p nil))
+                               :literals ("1" "1")))
+        (call-fn '(:funcs ((:sym 1+ :variadic-p nil))
+                          :literals ("1")))
+        (call-long '(:funcs ((:sym very-obscure-function :variadic-p nil))
+                            :literals ("1")))
+        (call-2-fns '(:funcs ((:sym 1+ :variadic-p nil)
+                              (:sym identity :variadic-p nil))
+                             :literals ("1"))))
+    ;; Prefer a single function call to two.
+    (should
+     (equal
+      (-sort #'suggest--cmp-relevance (list call-fn call-2-fns))
+      (list call-fn call-2-fns)))
+    ;; Prefer shorter function names.
+    (should
+     (equal
+      (-sort #'suggest--cmp-relevance (list call-fn call-long))
+      (list call-fn call-long)))
+    ;; Prefer fewer literals (we add literals when suggesting values).
+    (should
+     (equal
+      (-sort #'suggest--cmp-relevance (list call-fn add-constant))
+      (list call-fn add-constant)))))
