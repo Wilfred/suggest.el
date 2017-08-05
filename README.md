@@ -1,16 +1,16 @@
 # suggest.el
 
-***did you mean cadr?***
-
 [![Build Status](https://travis-ci.org/Wilfred/suggest.el.svg?branch=master)](https://travis-ci.org/Wilfred/suggest.el)
 [![Coverage Status](https://coveralls.io/repos/github/Wilfred/suggest.el/badge.svg?branch=master)](https://coveralls.io/github/Wilfred/suggest.el?branch=master)
 [![MELPA](http://melpa.org/packages/suggest-badge.svg)](http://melpa.org/#/suggest)
 
-suggest.el is an Emacs package for discovering elisp functions based
-on examples. You supply an example input and output, and it makes suggestions.
+suggest.el is an Emacs package for **discovering elisp functions based
+on examples**. You supply an example input and output, and it makes suggestions.
 
-Interested readers may enjoy my blog post:
-[Example Driven Development](http://www.wilfred.me.uk/blog/2016/07/30/example-driven-development/).
+Interested readers may enjoy my blog posts:
+
+* [Example Driven Development](http://www.wilfred.me.uk/blog/2016/07/30/example-driven-development/)
+* [Synthesising Elisp Code](http://www.wilfred.me.uk/blog/2017/07/02/synthesising-elisp-code/)
 
 ![suggest](suggest_screenshot.png)
 
