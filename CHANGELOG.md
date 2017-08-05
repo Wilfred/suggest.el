@@ -1,6 +1,8 @@
 # v0.5
 
-No changes yet.
+Suggest.el now only explores unique permutations of
+inputs. Previously, if the user provided `2 2 => 4` we would try the
+inputs reversed. This was slower and led to duplicate suggestions.
 
 # v0.4
 

@@ -582,8 +582,10 @@ than their values."
     (setq this-iteration
           (-map (-lambda ((values . literals))
                   (list :funcs nil :values values :literals literals))
-                (-zip-pair (suggest--permutations input-values)
-                           (suggest--permutations input-literals))))
+                ;; Only consider unique permutations.
+                (-distinct
+                 (-zip-pair (suggest--permutations input-values)
+                            (suggest--permutations input-literals)))))
     (catch 'done
       (dotimes (iteration suggest--search-depth)
         (catch 'done-iteration
