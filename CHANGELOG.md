@@ -1,3 +1,7 @@
+# v0.5
+
+No changes yet.
+
 # v0.4
 
 The search algorithm is now smarter at avoiding previoiusly-seen
