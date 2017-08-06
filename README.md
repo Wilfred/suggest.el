@@ -11,6 +11,7 @@ Interested readers may enjoy my blog posts:
 
 * [Example Driven Development](http://www.wilfred.me.uk/blog/2016/07/30/example-driven-development/)
 * [Synthesising Elisp Code](http://www.wilfred.me.uk/blog/2017/07/02/synthesising-elisp-code/)
+* [Suggest.el: Synthesising Constants](http://www.wilfred.me.uk/blog/2017/08/06/suggest-el-synthesising-constants/)
 
 ![suggest](suggest_screenshot.png)
 
