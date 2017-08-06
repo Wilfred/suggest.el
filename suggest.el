@@ -555,7 +555,7 @@ nil otherwise."
     ;; See if (func COMMON-CONSTANT value1 value2...) gives us a value.
     (when (zerop iteration)
       (dolist (extra-arg (list nil t 0 1 -1 2))
-        (dolist (position '(before after))
+        (dolist (position '(after before))
           (let ((args (if (eq position 'before)
                           (cons extra-arg input-values)
                         (-snoc input-values extra-arg)))
