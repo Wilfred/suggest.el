@@ -529,7 +529,9 @@ nil otherwise."
   (when (suggest--safe func (if variadic-p
                                 (car values)
                               values))
-    (let (func-output func-success)
+    (let ((default-directory "/")
+          (file-name-handler-alist nil)
+          func-output func-success)
       (ignore-errors
         (setq func-output
               (if variadic-p

@@ -4,6 +4,11 @@ Suggest.el now only explores unique permutations of
 inputs. Previously, if the user provided `2 2 => 4` we would try the
 inputs reversed. This was slower and led to duplicate suggestions.
 
+Suggest.el now returns the same results regardless of the value of
+`default-directory` and `file-name-handler-alist`. This fixes a bug
+where suggest.el would try to make tramp connections from URLs
+([#32](https://github.com/Wilfred/suggest.el/issues/32)).
+
 Added string function `s-truncate`.
 
 # v0.4
