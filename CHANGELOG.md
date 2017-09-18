@@ -4,6 +4,8 @@ Suggest.el now only explores unique permutations of
 inputs. Previously, if the user provided `2 2 => 4` we would try the
 inputs reversed. This was slower and led to duplicate suggestions.
 
+Added string function `s-truncate`.
+
 # v0.4
 
 The search algorithm is now smarter at avoiding previoiusly-seen

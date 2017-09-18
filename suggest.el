@@ -187,6 +187,7 @@
    #'s-chop-prefixes
    #'s-shared-start
    #'s-shared-end
+   #'s-truncate
    #'s-repeat
    #'s-concat
    #'s-prepend
