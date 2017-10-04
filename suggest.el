@@ -658,30 +658,43 @@ than their values."
 (defun suggest--cmp-relevance (pos1 pos2)
   "Compare two possibilities such that the more relevant result
   is smaller."
-  ;; We prefer fewer functions, and we prefer simpler functions. We
-  ;; use a dumb but effective heuristic: concatenate the function
-  ;; names and take the shortest.
-  (cond
-   ;; If we have the same number of function calls, with the same
-   ;; number of arguments, prefer functions with shorter names.
-   ((and
-     (= (length (plist-get pos1 :funcs)) (length (plist-get pos2 :funcs)))
-     (= (length (plist-get pos1 :literals)) (length (plist-get pos2 :literals))))
-    (let ((join-names (lambda (pos)
-                        (->> (plist-get pos :funcs)
-                             (--map (plist-get it :sym))
-                             (-map #'symbol-name)
-                             (apply #'concat)))))
-      (< (length (funcall join-names pos1)) (length (funcall join-names pos2)))))
+  (let ((pos1-func-count (length (plist-get pos1 :funcs)))
+        (pos2-func-count (length (plist-get pos2 :funcs)))
+        (pos1-arg-count (length (plist-get pos1 :literals)))
+        (pos2-arg-count (length (plist-get pos2 :literals)))
+        (pos1-apply-count (length (--filter (plist-get it :variadic-p)
+                                            (plist-get pos1 :funcs))))
+        (pos2-apply-count (length (--filter (plist-get it :variadic-p)
+                                            (plist-get pos2 :funcs)))))
+    (cond
+     ;; If we have the same number of function calls, with the same
+     ;; number of arguments, prefer functions with shorter names. This
+     ;; is a dumb but surprisingly effective heuristic.
+     ((and
+       (= pos1-func-count pos2-func-count)
+       (= pos1-arg-count pos2-arg-count)
+       (= pos1-apply-count pos2-apply-count))
+      (let ((join-names (lambda (pos)
+                          (->> (plist-get pos :funcs)
+                               (--map (plist-get it :sym))
+                               (-map #'symbol-name)
+                               (apply #'concat)))))
+        (< (length (funcall join-names pos1)) (length (funcall join-names pos2)))))
 
-   ;; Prefer calls that don't have extra arguments, so prefer (1+ 1)
-   ;; over (+ 1 1).
-   ((= (length (plist-get pos1 :funcs)) (length (plist-get pos2 :funcs)))
-    (< (length (plist-get pos1 :literals)) (length (plist-get pos2 :literals))))
+     ;; Prefer direct function calls to using apply.
+     ((and
+       (= pos1-func-count pos2-func-count)
+       (= pos1-arg-count pos2-arg-count))
+      (< pos1-apply-count pos2-apply-count))
 
-   ;; Prefer fewer function calls over all else.
-   (t
-    (< (length (plist-get pos1 :funcs)) (length (plist-get pos2 :funcs))))))
+     ;; Prefer calls that don't have extra arguments, so prefer (1+ 1)
+     ;; over (+ 1 1).
+     ((= pos1-func-count pos2-func-count)
+      (< pos1-arg-count pos2-arg-count))
+
+     ;; Prefer fewer function calls over all else.
+     (t
+      (< (length (plist-get pos1 :funcs)) (length (plist-get pos2 :funcs)))))))
 
 ;;;###autoload
 (defun suggest-update ()

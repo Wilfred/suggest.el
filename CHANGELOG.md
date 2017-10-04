@@ -13,6 +13,9 @@ Added string function `s-truncate`.
 
 Added parsing function `read`.
 
+Improved sorting of suggestions to penalise `apply` relative to direct
+function calls.
+
 # v0.4
 
 The search algorithm is now smarter at avoiding previoiusly-seen

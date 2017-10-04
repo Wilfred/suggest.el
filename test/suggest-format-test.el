@@ -36,6 +36,8 @@
                                :literals ("1" "1")))
         (call-fn '(:funcs ((:sym 1+ :variadic-p nil))
                           :literals ("1")))
+        (call-fn-varadic '(:funcs ((:sym 1+ :variadic-p t))
+                                  :literals ("1")))
         (call-long '(:funcs ((:sym very-obscure-function :variadic-p nil))
                             :literals ("1")))
         (call-2-fns '(:funcs ((:sym 1+ :variadic-p nil)
@@ -55,4 +57,9 @@
     (should
      (equal
       (-sort #'suggest--cmp-relevance (list call-fn add-constant))
-      (list call-fn add-constant)))))
+      (list call-fn add-constant)))
+    ;; Prefer calling functions directly to `apply'.
+    (should
+     (equal
+      (-sort #'suggest--cmp-relevance (list call-fn-varadic call-fn))
+      (list call-fn call-fn-varadic)))))
