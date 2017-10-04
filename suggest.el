@@ -111,6 +111,10 @@
    #'-first-item
    #'-last-item
    #'-butlast
+   ;; dash.el folding/unfolding
+   #'-reduce
+   #'-reduce-r
+   #'-iterate
    ;; alist functions
    #'assoc
    #'alist-get
@@ -275,6 +279,9 @@ See also `suggest-extra-args'.")
    #'car '(nil)
    ;; `format' has specific formatting strings that are worth trying.
    #'format '("%d" "%o" "%x" "%X" "%e" "%c" "%f" "%s" "%S")
+   ;; `-iterate' is great for building incrementing/decrementing lists.
+   ;; (an alternative to `number-sequence'.
+   #'-iterate '(1+ 1-)
    ;; These common values often set flags in interesting ways.
    t '(nil t -1 0 1 2))
   "Some functions work best with a special extra argument.

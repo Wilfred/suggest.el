@@ -21,6 +21,8 @@ Added formatting function `format`.
 Defined a variable `suggest-extra-args` so suggest.el may consider
 additional function-specific arguments.
 
+Added functions `-reduce`, `-reduce-r` and `-iterate`.
+
 # v0.4
 
 The search algorithm is now smarter at avoiding previoiusly-seen
