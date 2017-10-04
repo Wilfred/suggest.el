@@ -569,6 +569,21 @@ nil otherwise."
               :variadic-p variadic-p
               :literals literals)))))
 
+(defun suggest--unread (value)
+  "Convert VALUE to a string that can be read to obtain VALUE.
+This is primarily for quoting symbols."
+  (cond
+   ((consp value)
+    (format "'%S" value))
+   ((and
+     (symbolp value)
+     (not (keywordp value))
+     (not (eq value nil))
+     (not (eq value t)))
+    (format "'%s" value))
+   (t
+    (format "%s" value))))
+
 (defun suggest--try-call (iteration func input-values input-literals)
   "Try to call FUNC with INPUT-VALUES, and return a list of outputs"
   (let (outputs)
@@ -591,8 +606,8 @@ nil otherwise."
                           (cons extra-arg input-values)
                         (-snoc input-values extra-arg)))
                 (literals (if (eq position 'before)
-                              (cons (format "%S" extra-arg) input-literals)
-                            (-snoc input-literals (format "%S" extra-arg)))))
+                              (cons (suggest--unread extra-arg) input-literals)
+                            (-snoc input-literals (suggest--unread extra-arg)))))
             (-when-let (result (suggest--call func args literals))
               (push result outputs))))))
     ;; Return results in ascending order of preference, so we prefer
