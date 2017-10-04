@@ -9,4 +9,5 @@
   (should (equal (suggest--unread nil) "nil"))
   (should (equal (suggest--unread '(1 2)) "'(1 2)"))
   (should (equal (suggest--unread :foo) ":foo"))
-  (should (equal (suggest--unread 42) "42")))
+  (should (equal (suggest--unread 42) "42"))
+  (should (equal (suggest--unread "foo") "\"foo\"")))

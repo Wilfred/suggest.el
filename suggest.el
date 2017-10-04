@@ -589,7 +589,7 @@ This is primarily for quoting symbols."
      (not (eq value t)))
     (format "'%s" value))
    (t
-    (format "%s" value))))
+    (format "%S" value))))
 
 (defun suggest--try-call (iteration func input-values input-literals)
   "Try to call FUNC with INPUT-VALUES, and return a list of outputs"
