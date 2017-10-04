@@ -44,6 +44,10 @@ FORM must use _ for the user's input."
   ;; Apply a list of arguments.
   (should-suggest '(2 3) => 5
                   (+ _))
+  ;; This reuqires custom extra arguments for `format', specifically
+  ;; "%o". TODO: make `should-suggest' assert this argument.
+  (should-suggest '25 => "31"
+                  (format _))
   ;; Regression test.
   (should-suggest '(a b c d) 'c => 2
                   (-elem-index _)))

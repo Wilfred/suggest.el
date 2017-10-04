@@ -166,6 +166,7 @@
    #'split-string
    #'capitalize
    #'replace-regexp-in-string
+   #'format
    ;; Quoting strings
    #'shell-quote-argument
    #'regexp-quote
@@ -259,7 +260,28 @@ arguments, and no arguments are functions. For other functions,
 the likelihood of users discovering them is too low.
 
 Likewise, we avoid predicates of one argument, as those generally
-need multiple examples to ensure they do what the user wants.")
+need multiple examples to ensure they do what the user wants.
+
+See also `suggest-extra-args'.")
+
+(defvar suggest-extra-args
+  (list
+   ;; There's no special values for `list', and it produces silly
+   ;; results when we add values.
+   #'list '()
+   ;; Similarly, we can use nil with `car' to build a list, but
+   ;; otherwise we're just building an irrelevant list if we use the
+   ;; default values.
+   #'car '(nil)
+   ;; `format' has specific formatting strings that are worth trying.
+   #'format '("%d" "%o" "%x" "%X" "%e" "%c" "%f" "%s" "%S")
+   ;; These common values often set flags in interesting ways.
+   t '(nil t -1 0 1 2))
+  "Some functions work best with a special extra argument.
+
+This plist associates functions with particular arguments that
+produce good results. If a function isn't explicitly mentioned,
+we look up `t' instead.")
 
 (defun suggest--safe (fn args)
   "Is FN safe to call with ARGS?"
@@ -561,7 +583,8 @@ nil otherwise."
 
     ;; See if (func COMMON-CONSTANT value1 value2...) gives us a value.
     (when (zerop iteration)
-      (dolist (extra-arg (list nil t 0 1 -1 2))
+      (dolist (extra-arg (or (plist-get suggest-extra-args func)
+                             (plist-get suggest-extra-args t)))
         (dolist (position '(after before))
           (let ((args (if (eq position 'before)
                           (cons extra-arg input-values)

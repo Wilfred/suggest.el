@@ -16,6 +16,11 @@ Added parsing function `read`.
 Improved sorting of suggestions to penalise `apply` relative to direct
 function calls.
 
+Added formatting function `format`.
+
+Defined a variable `suggest-extra-args` so suggest.el may consider
+additional function-specific arguments.
+
 # v0.4
 
 The search algorithm is now smarter at avoiding previoiusly-seen
