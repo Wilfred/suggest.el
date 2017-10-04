@@ -11,6 +11,8 @@ where suggest.el would try to make tramp connections from URLs
 
 Added string function `s-truncate`.
 
+Added parsing function `read`.
+
 # v0.4
 
 The search algorithm is now smarter at avoiding previoiusly-seen

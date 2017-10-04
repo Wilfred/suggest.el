@@ -1,0 +1,5 @@
+(ert-deftest suggest--safe ()
+  (should (not (suggest--safe 'upcase '(-1))))
+  (should (suggest--safe 'upcase '(1)))
+  (should (not (suggest--safe 'read '(nil))))
+  (should (suggest--safe 'read '(1 1))))

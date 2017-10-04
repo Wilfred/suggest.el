@@ -36,8 +36,6 @@
 (eval-when-compile
   (require 'cl-lib)) ;; cl-incf
 
-;; TODO: add #'read, but don't prompt for input when the example is nil.
-;;
 ;; See also `cl--simple-funcs' and `cl--safe-funcs'.
 (defvar suggest-functions
   (list
@@ -211,6 +209,7 @@
    #'symbol-value
    #'symbol-file
    #'intern
+   #'read
    ;; Converting between types
    #'string-to-list
    #'string-to-number
@@ -263,16 +262,20 @@ Likewise, we avoid predicates of one argument, as those generally
 need multiple examples to ensure they do what the user wants.")
 
 (defun suggest--safe (fn args)
-  "Is FN safe to call with ARGS?
-Due to Emacs bug #25684, some string functions cause Emacs to segfault
-when given negative integers."
+  "Is FN safe to call with ARGS?"
   (not
-   ;; These functions call caseify_object in casefiddle.c.
-   (and (memq fn '(upcase downcase capitalize upcase-initials))
-        (consp args)
-        (null (cdr args))
-        (integerp (car args))
-        (< (car args) 0))))
+   (or
+    ;; Due to Emacs bug #25684, string functions that call
+    ;; caseify_object in casefiddle.c cause Emacs to segfault when
+    ;; given negative integers.
+    (and (memq fn '(upcase downcase capitalize upcase-initials))
+         (consp args)
+         (null (cdr args))
+         (integerp (car args))
+         (< (car args) 0))
+    ;; If `read' is called with nil or t, it prompts interactively.
+    (and (eq fn 'read)
+         (member args '(nil (nil) (t)))))))
 
 (defface suggest-heading
   '((((class color) (background light)) :foreground "DarkGoldenrod4" :weight bold)
