@@ -583,8 +583,9 @@ nil otherwise."
 
     ;; See if (func COMMON-CONSTANT value1 value2...) gives us a value.
     (when (zerop iteration)
-      (dolist (extra-arg (or (plist-get suggest-extra-args func)
-                             (plist-get suggest-extra-args t)))
+      (dolist (extra-arg (if (plist-member suggest-extra-args func)
+                             (plist-get suggest-extra-args func)
+                           (plist-get suggest-extra-args t)))
         (dolist (position '(after before))
           (let ((args (if (eq position 'before)
                           (cons extra-arg input-values)
