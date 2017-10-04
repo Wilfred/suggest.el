@@ -43,6 +43,7 @@
   (list
    ;; TODO: add funcall, apply and map?
    ;; Built-in functions that access or examine lists.
+   ;; TODO: why isn't car marked as pure?
    #'car
    #'cdr
    #'cadr
