@@ -310,6 +310,9 @@ See also `suggest-extra-args'.")
    ;; Only use nil as an extra value, so we can discover remove as an
    ;; alternative to `-non-nil'.
    #'remove '(nil)
+   ;; mapcar with identity is a fun way to convert sequences (strings,
+   ;; vectors) to lists.
+   #'mapcar '(identity)
    ;; These common values often set flags in interesting
    ;; ways.
    t '(nil t -1 0 1 2))
