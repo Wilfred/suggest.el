@@ -49,6 +49,7 @@
    #'last
    #'cons
    #'nth
+   #'nthcdr
    #'list
    #'length
    #'safe-length
