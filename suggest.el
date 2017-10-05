@@ -28,13 +28,7 @@
 
 ;;; Code:
 
-(require 'dash)
-(require 'loop)
-(require 's)
-(require 'f)
 (require 'subr-x)
-(eval-when-compile
-  (require 'cl-lib)) ;; cl-incf
 
 (defun foo (x)
   x)
