@@ -60,6 +60,7 @@
    ;; Built-in functions that create lists.
    #'make-list
    #'number-sequence
+   #'mapcar
    ;; Sequence functions
    #'elt
    #'aref
@@ -111,6 +112,8 @@
    #'-first-item
    #'-last-item
    #'-butlast
+   #'-map
+   #'-mapcat
    ;; dash.el folding/unfolding
    #'-reduce
    #'-reduce-r

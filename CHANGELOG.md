@@ -1,6 +1,6 @@
 # v0.6
 
-No changes yet.
+Added mapping functions `mapcar`, `-map` and `-mapcat`.
 
 # v0.5
 
