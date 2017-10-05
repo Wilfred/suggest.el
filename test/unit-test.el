@@ -4,7 +4,10 @@
   (should (not (suggest--safe 'upcase '(-1))))
   (should (suggest--safe 'upcase '(1)))
   (should (not (suggest--safe 'read '(nil))))
-  (should (suggest--safe 'read '(1 1))))
+  (should (suggest--safe 'read '(1 1)))
+  (should (not (suggest--safe '-interleave '())))
+  (should (not (suggest--safe '-zip '())))
+  (should (suggest--safe '-interleave '(1 1))))
 
 (ert-deftest suggest--unread ()
   (should (equal (suggest--unread 'foo) "'foo"))

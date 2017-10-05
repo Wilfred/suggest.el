@@ -2,6 +2,8 @@
 
 Added mapping functions `mapcar`, `-map` and `-mapcat`.
 
+Fixed an infinite loop when we tried to call `-interleave`.
+
 # v0.5
 
 Suggest.el now only explores unique permutations of
