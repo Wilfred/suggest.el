@@ -582,6 +582,8 @@ This is primarily for quoting symbols."
   (cond
    ((consp value)
     (format "'%S" value))
+   ((functionp value)
+    (format "#'%s" value))
    ((and
      (symbolp value)
      (not (keywordp value))

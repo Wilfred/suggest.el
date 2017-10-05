@@ -1,3 +1,5 @@
+(require 'suggest)
+
 (ert-deftest suggest--safe ()
   (should (not (suggest--safe 'upcase '(-1))))
   (should (suggest--safe 'upcase '(1)))
@@ -10,4 +12,5 @@
   (should (equal (suggest--unread '(1 2)) "'(1 2)"))
   (should (equal (suggest--unread :foo) ":foo"))
   (should (equal (suggest--unread 42) "42"))
-  (should (equal (suggest--unread "foo") "\"foo\"")))
+  (should (equal (suggest--unread "foo") "\"foo\""))
+  (should (equal (suggest--unread '1+) "#'1+")))
