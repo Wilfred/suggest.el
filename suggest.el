@@ -277,16 +277,41 @@ See also `suggest-extra-args'.")
    ;; There's no special values for `list', and it produces silly
    ;; results when we add values.
    #'list '()
-   ;; Similarly, we can use nil with `car' to build a list, but
-   ;; otherwise we're just building an irrelevant list if we use the
-   ;; default values.
-   #'car '(nil)
+   ;; Similarly, we can use nil when building a list, but otherwise
+   ;; we're just building an irrelevant list if we use the default
+   ;; values.
+   #'cons '(nil)
+   #'-cons* '(nil)
+   #'-snoc '(nil)
+   #'append '(nil)
    ;; `format' has specific formatting strings that are worth trying.
    #'format '("%d" "%o" "%x" "%X" "%e" "%c" "%f" "%s" "%S")
    ;; `-iterate' is great for building incrementing/decrementing lists.
-   ;; (an alternative to `number-sequence'.
+   ;; (an alternative to `number-sequence').
    #'-iterate '(1+ 1-)
-   ;; These common values often set flags in interesting ways.
+   ;; For indexing functions, just use non-negative numbers. This
+   ;; avoids confusing results like (last nil 5) => nil.
+   #'elt '(0 1 2)
+   #'nth '(0 1 2)
+   #'nthcdr '(0 1 2)
+   #'last '(0 1 2)
+   #'-drop '(0 1 2)
+   #'-drop-last '(0 1 2)
+   #'-take '(0 1 2)
+   ;; For functions that look up a value, don't supply any extra
+   ;; arguments.
+   #'plist-member '()
+   #'assoc '()
+   ;; Likewise for comparisons, there's no interesting extra value we can offer.
+   #'-is-suffix-p '()
+   #'-is-prefix-p '()
+   #'-is-infix-p '()
+   ;; Remove has some weird behaviours with t: (remove 'foo t) => t.
+   ;; Only use nil as an extra value, so we can discover remove as an
+   ;; alternative to `-non-nil'.
+   #'remove '(nil)
+   ;; These common values often set flags in interesting
+   ;; ways.
    t '(nil t -1 0 1 2))
   "Some functions work best with a special extra argument.
 

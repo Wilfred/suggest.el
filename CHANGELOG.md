@@ -6,6 +6,8 @@ Added function `nthcdr`.
 
 Fixed an infinite loop when we tried to call `-interleave`.
 
+Improved `suggest-extra-args` so fewer silly suggestions are made.
+
 # v0.5
 
 Suggest.el now only explores unique permutations of
