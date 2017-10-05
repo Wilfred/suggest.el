@@ -1,3 +1,7 @@
+# v0.6
+
+No changes yet.
+
 # v0.5
 
 Suggest.el now only explores unique permutations of
