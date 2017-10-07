@@ -33,6 +33,7 @@
 (require 's)
 (require 'f)
 (require 'subr-x)
+(require 'cl-extra) ;; cl-prettyprint
 (eval-when-compile
   (require 'cl-lib)) ;; cl-incf
 
