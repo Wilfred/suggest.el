@@ -182,6 +182,7 @@
    #'capitalize
    #'replace-regexp-in-string
    #'format
+   #'string-join
    ;; Quoting strings
    #'shell-quote-argument
    #'regexp-quote
