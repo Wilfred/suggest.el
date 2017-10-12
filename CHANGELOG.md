@@ -8,6 +8,9 @@ Fixed an infinite loop when we tried to call `-interleave`.
 
 Improved `suggest-extra-args` so fewer silly suggestions are made.
 
+Fixed an Emacs 24 segfault due to `read` crashing when called with
+certain lists.
+
 # v0.5
 
 Suggest.el now only explores unique permutations of

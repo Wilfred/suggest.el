@@ -344,6 +344,11 @@ we look up `t' instead.")
     ;; If `read' is called with nil or t, it prompts interactively.
     (and (eq fn 'read)
          (member args '(nil (nil) (t))))
+    ;; Work around https://github.com/Wilfred/suggest.el/issues/37 on
+    ;; Emacs 24, where it's possible to crash `read' with a list.
+    (and (eq fn 'read)
+         (eq emacs-major-version 24)
+         (consp (car args)))
     ;; Work around https://github.com/magnars/dash.el/issues/241
     (and (memq fn '(-interleave -zip))
          (null args)))))
