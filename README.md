@@ -116,6 +116,21 @@ pure functions with a small number of arguments using only simple data
 types. We only include functions that users could 'stumble upon' with
 the right set of inputs.
 
+## Contributing
+
+To work on the code, clone the repo, then you can eval suggest.el in
+your current Emacs instance.
+
+To run the tests, you will
+need [Cask](https://github.com/cask/cask). Once you've installed Cask,
+you can install the suggest.el dependencies and run the tests as
+follows:
+
+``` bash
+$ cask
+$ cask exec ert-runner
+```
+
 ## License
 
 GPLv3.
