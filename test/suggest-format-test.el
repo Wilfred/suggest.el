@@ -62,4 +62,7 @@
     (should
      (equal
       (-sort #'suggest--cmp-relevance (list call-fn-varadic call-fn))
-      (list call-fn call-fn-varadic)))))
+      (list call-fn call-fn-varadic)))
+    ;; TODO: prefer functions whose arguments are in the order
+    ;; specified by the user. This helps with 1 3 => 3.
+    ))
