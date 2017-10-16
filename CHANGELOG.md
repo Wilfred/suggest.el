@@ -11,6 +11,8 @@ Improved `suggest-extra-args` so fewer silly suggestions are made.
 Fixed an Emacs 24 segfault due to `read` crashing when called with
 certain lists.
 
+Added functions `-sort` and `string-join`.
+
 # v0.5
 
 Suggest.el now only explores unique permutations of
