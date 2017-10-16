@@ -108,8 +108,8 @@ example):
 
 ## How it works
 
-suggest.el tries your inputs (in any order) against every function in
-`suggest-functions`.
+suggest.el uses enumerative program synthesis. It tries your inputs
+(in any order) against every function in `suggest-functions`.
 
 `suggest-functions` is a carefully chosen function list: they're all
 pure functions with a small number of arguments using only simple data
