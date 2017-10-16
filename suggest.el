@@ -111,6 +111,7 @@
    #'-intersection
    #'-distinct
    #'-rotate
+   #'-sort
    #'-repeat
    #'-cons*
    #'-snoc
@@ -182,6 +183,7 @@
    #'capitalize
    #'replace-regexp-in-string
    #'format
+   #'string-join
    ;; Quoting strings
    #'shell-quote-argument
    #'regexp-quote
@@ -296,6 +298,8 @@ See also `suggest-extra-args'.")
    ;; `-iterate' is great for building incrementing/decrementing lists.
    ;; (an alternative to `number-sequence').
    #'-iterate '(1+ 1-)
+   ;; Lists can be sorted in a variety of ways.
+   #'-sort '(< > string< string>)
    ;; For indexing functions, just use non-negative numbers. This
    ;; avoids confusing results like (last nil 5) => nil.
    #'elt '(0 1 2)
