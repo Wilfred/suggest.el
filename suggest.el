@@ -37,6 +37,15 @@
 (eval-when-compile
   (require 'cl-lib)) ;; cl-incf
 
+(defgroup suggest nil
+  "Discover elisp functions that do what you want."
+  :group 'lisp)
+
+(defcustom suggest-pop-to-buffer nil
+  "Pop to a window other than the selected one."
+  :type 'boolean
+  :group 'suggest)
+
 ;; See also `cl--simple-funcs' and `cl--safe-funcs'.
 (defvar suggest-functions
   (list
@@ -435,7 +444,10 @@ and outputs given."
   (let ((buf (get-buffer-create "*suggest*"))
         (inhibit-read-only t)
         (inhibit-modification-hooks t))
-    (switch-to-buffer buf)
+    (if suggest-pop-to-buffer
+        (pop-to-buffer-same-window buf)
+      (switch-to-buffer buf))
+
     (erase-buffer)
     (suggest-mode)
 
