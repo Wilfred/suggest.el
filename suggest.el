@@ -425,7 +425,7 @@ we look up `t' instead.")
 
 (defun suggest--keybinding (command keymap)
   "Find the keybinding for COMMAND in KEYMAP."
-  (car (where-is-internal command keymap)))
+  (where-is-internal command keymap t))
 
 ;;;###autoload
 (defun suggest ()
