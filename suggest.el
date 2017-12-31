@@ -37,6 +37,21 @@
 (eval-when-compile
   (require 'cl-lib)) ;; cl-incf
 
+(defcustom suggest-insert-example-on-start t
+  "If t, insert example data in suggest buffer, else don't."
+  :group 'suggest
+  :type 'boolean)
+
+(defvar suggest-example-input
+  "1\n2"
+  "The example input data inserted into the suggest buffer on start.
+This should be a string, with multiple inputs separated by a newline.")
+
+(defvar suggest-example-output
+  "3"
+  "The example output data inserted into the suggest buffer on start.
+This should be a string.")
+
 ;; See also `cl--simple-funcs' and `cl--safe-funcs'.
 (defvar suggest-functions
   (list
@@ -445,18 +460,21 @@ and outputs given."
     (suggest-mode)
 
     (suggest--insert-heading suggest--inputs-heading)
-    (insert "1\n2")
+    (when suggest-insert-example-on-start
+      (insert suggest-example-input))
 
     (suggest--insert-section-break)
 
     (suggest--insert-heading suggest--outputs-heading)
-    (insert "3")
+    (when suggest-insert-example-on-start
+      (insert suggest-example-output))
 
     (suggest--insert-section-break)
 
     (suggest--insert-heading suggest--results-heading)
     ;; Populate the suggestions for 1, 2 => 3
-    (suggest-update)
+    (when suggest-insert-example-on-start
+      (suggest-update))
 
     ;; Put point on the first input.
     (suggest--nth-heading 1)
