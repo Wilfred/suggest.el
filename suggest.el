@@ -424,7 +424,8 @@ Safety here means that we:
     ;; Start the overlay after the ";; " bit.
     (let ((overlay (make-overlay (+ 3 start) end)))
       ;; Highlight the text in the heading.
-      (overlay-put overlay 'face 'suggest-heading))))
+      (overlay-put overlay 'face 'suggest-heading)))
+  (insert "\n"))
 
 (defun suggest--on-heading-p ()
   "Return t if point is on a heading."
@@ -465,6 +466,10 @@ Safety here means that we:
   "Find the keybinding for COMMAND in KEYMAP."
   (where-is-internal command keymap t))
 
+(defun suggest--insert-section-break ()
+  "Insert section break."
+  (insert "\n\n"))
+
 ;;;###autoload
 (defun suggest ()
   "Open a Suggest buffer that provides suggestions for the inputs
@@ -478,13 +483,19 @@ and outputs given."
     (suggest-mode)
 
     (suggest--insert-heading suggest--inputs-heading)
-    (insert "\n1\n2\n\n")
+    (insert "1\n2")
+
+    (suggest--insert-section-break)
+
     (suggest--insert-heading suggest--outputs-heading)
-    (insert "\n3\n\n")
+    (insert "3")
+
+    (suggest--insert-section-break)
+
     (suggest--insert-heading suggest--results-heading)
-    (insert "\n")
     ;; Populate the suggestions for 1, 2 => 3
     (suggest-update)
+
     ;; Put point on the first input.
     (suggest--nth-heading 1)
     (forward-line 1))
