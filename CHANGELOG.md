@@ -1,3 +1,7 @@
+# v0.7
+
+Nothing yet.
+
 # v0.6
 
 **Critical**: Fixed an issue where suggest.el would call symbols given
