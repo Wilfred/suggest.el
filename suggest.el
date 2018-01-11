@@ -76,6 +76,7 @@
    #'cl-first
    #'cl-second
    #'cl-third
+   #'cl-list*
    ;; dash.el list functions.
    #'-non-nil
    #'-slice

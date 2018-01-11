@@ -2,7 +2,7 @@
 
 Added mapping functions `mapcar`, `-map` and `-mapcat`.
 
-Added function `nthcdr`.
+Added list functions `nthcdr` and `cl-list*`.
 
 Fixed an infinite loop when we tried to call `-interleave`.
 
