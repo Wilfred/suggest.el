@@ -51,3 +51,12 @@ FORM must use _ for the user's input."
   ;; Regression test.
   (should-suggest '(a b c d) 'c => 2
                   (-elem-index _)))
+
+(ert-deftest suggest-higher-order-fns ()
+  "We should not call higher order functions with symbols that
+aren't whitelisted."
+  ;; We should not end up calling the function `debug'.
+  (suggest--possibilities
+   (list "'debug")
+   (list 'debug)
+   'foo))

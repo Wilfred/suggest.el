@@ -1,5 +1,9 @@
 # v0.6
 
+**Critical**: Fixed an issue where suggest.el would call symbols given
+as inputs, or synthesised from strings. Suggest now ensures that
+higher order functions don't lead to unexpected code being executed.
+
 Added mapping functions `mapcar`, `-map` and `-mapcat`.
 
 Added list functions `nthcdr` and `cl-list*`.
