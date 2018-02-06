@@ -1,6 +1,6 @@
 # v0.7
 
-Nothing yet.
+Added vector function `vector`.
 
 # v0.6
 

@@ -139,6 +139,7 @@
    #'hash-table-values
    ;; vectors
    ;; TODO: there must be more worth using
+   #'vector
    #'vconcat
    ;; Arithmetic
    #'+
