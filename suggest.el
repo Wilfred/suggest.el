@@ -184,6 +184,7 @@
    #'replace-regexp-in-string
    #'format
    #'string-join
+   #'prin1-to-string
    ;; Quoting strings
    #'shell-quote-argument
    #'regexp-quote

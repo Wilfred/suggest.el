@@ -2,6 +2,8 @@
 
 Added vector function `vector`.
 
+Added formatting function `prin1-to-string`.
+
 # v0.6
 
 **Critical**: Fixed an issue where suggest.el would call symbols given
