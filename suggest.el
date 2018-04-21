@@ -175,6 +175,10 @@
    #'ftruncate
    #'1+
    #'1-
+   #'evenp
+   #'natnump
+   #'oddp
+   #'zerop
    ;; Logical operators
    #'lsh
    #'logand
