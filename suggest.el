@@ -48,10 +48,19 @@
    ;; TODO: add funcall, apply and map?
    ;; Boolean functions
    #'not
+   ;; Type predicates
+   #'arrayp
+   #'atom
    #'booleanp
    #'consp
+   #'floatp
+   #'functionp
+   #'integerp
+   #'listp
    #'numberp
+   #'sequencep
    #'stringp
+   #'symbolp
    ;; Built-in functions that access or examine lists.
    ;; TODO: why isn't car marked as pure?
    #'car
@@ -389,7 +398,7 @@ Safety here means that we:
          (null args))
     (and (memq fn suggest-funcall-functions) ;
          ;; TODO: what about circular lists?
-         ;; 
+         ;;
          ;; Does apply even handle that nicely? It looks like apply
          ;; tries to get the length of the list and hangs until C-g.
          (format-proper-list-p args)
