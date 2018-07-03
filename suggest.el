@@ -197,6 +197,10 @@
    #'replace-regexp-in-string
    #'format
    #'string-join
+   #'string-prefix-p
+   #'string-suffix-p
+   #'string-remove-prefix
+   #'string-remove-suffix
    #'prin1-to-string
    ;; Quoting strings
    #'shell-quote-argument
