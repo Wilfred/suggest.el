@@ -1,5 +1,7 @@
 # v0.7
 
+Performance improvements.
+
 Added vector function `vector`.
 
 Added formatting function `prin1-to-string`.

@@ -759,7 +759,12 @@ than their values."
         intermediates
         (intermediates-count 0)
         (value-occurrences (make-hash-table :test #'equal))
-        (funcs (append suggest-functions suggest-funcall-functions)))
+        (funcs (append suggest-functions suggest-funcall-functions))
+        ;; Since we incrementally build a huge list of results,
+        ;; garbage collection does a load of work but doesn't find
+        ;; much to collect. Disable GC, as it significantly improves
+        ;; performance.
+        (gc-cons-threshold 50000000))
     ;; Setup: no function calls, all permutations of our inputs.
     (setq this-iteration
           (-map (-lambda ((values . literals))
