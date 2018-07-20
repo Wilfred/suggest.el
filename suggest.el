@@ -34,8 +34,7 @@
 (require 'f)
 (require 'subr-x)
 (require 'cl-extra) ;; cl-prettyprint
-(eval-when-compile
-  (require 'cl-lib)) ;; cl-incf
+(require 'cl-lib) ;; cl-incf, cl-evenp, cl-oddp
 
 (defcustom suggest-insert-example-on-start t
   "If t, insert example data in suggest buffer, else don't."
@@ -175,9 +174,9 @@
    #'ftruncate
    #'1+
    #'1-
-   #'evenp
+   #'cl-evenp
    #'natnump
-   #'oddp
+   #'cl-oddp
    #'zerop
    ;; Logical operators
    #'lsh
