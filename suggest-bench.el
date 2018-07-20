@@ -9,10 +9,10 @@
 (defmacro suggest--print-time (form)
   "Evaluate FORM, and print the time taken."
   `(progn
-     (message "Timing %s" ',form)
+     (message "%s" ',form)
      (-let [(total-time gc-runs gc-time)
             (shut-up (benchmark-run 1 ,form))]
-       (message "Elapsed time: %fs (%fs in %d GCs)"
+       (message "  time: %fs (%fs in %d GCs)"
                 total-time
                 gc-time
                 gc-runs))))
