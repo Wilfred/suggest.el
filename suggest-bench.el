@@ -20,12 +20,15 @@
 
 (defun suggest-bench ()
   (interactive)
+  ;; Basic arithmetic.
   (suggest--print-time
    (suggest--possibilities '("x" "y") '(1 2) 3))
+  ;; List access.
   (suggest--print-time
-   (suggest--possibilities '("x" "y") '(?a ?b ?c) ?c))
+   (suggest--possibilities '("x") '((?a ?b ?c)) ?c))
+  ;; Zero results.
   (suggest--print-time
-   (suggest--possibilities '("x") '((1 2 3 4 5)) 15)))
+   (suggest--possibilities '("x") '("foo") "bar")))
 
 (provide 'suggest-bench)
 ;; suggest-bench.el ends here
