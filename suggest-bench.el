@@ -18,7 +18,7 @@
                 gc-runs))))
 
 
-(defun suggest-bench ()
+(defun suggest--possibilities-bench ()
   (interactive)
   ;; Basic arithmetic.
   (suggest--print-time
@@ -26,9 +26,19 @@
   ;; List access.
   (suggest--print-time
    (suggest--possibilities '("x") '((?a ?b ?c)) ?c))
+  ;; List generation
+  (suggest--print-time
+   (suggest--possibilities '("x") '(4) '(1 2 3 4)))
   ;; Zero results.
   (suggest--print-time
    (suggest--possibilities '("x") '("foo") "bar")))
+
+(defun suggest-bench ()
+  (interactive)
+  ;; Overall call time.
+  (suggest--print-time
+   (suggest))
+  )
 
 (provide 'suggest-bench)
 ;; suggest-bench.el ends here
