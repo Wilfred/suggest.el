@@ -7,7 +7,10 @@
   (should (suggest--safe-p 'read '(1 1)))
   (should (not (suggest--safe-p '-interleave '())))
   (should (not (suggest--safe-p '-zip '())))
-  (should (suggest--safe-p '-interleave '(1 1))))
+  (should (suggest--safe-p '-interleave '(1 1)))
+  (should (not (suggest--safe-p #'mapcar (list 'unknown-function))))
+  (should (not (suggest--safe-p #'mapcar (list (lambda (x) (unknown-function))))))
+  (should (suggest--safe-p 'mapcar (list #'identity '(1 2 3)))))
 
 (ert-deftest suggest--unread ()
   (should (equal (suggest--unread 'foo) "'foo"))

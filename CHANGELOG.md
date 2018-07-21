@@ -1,6 +1,6 @@
 # v0.8
 
-No changes yet.
+Fixed an issue where higher-order functions weren't always suggested.
 
 # v0.7
 

@@ -415,7 +415,7 @@ Safety here means that we:
                 (and (symbolp it) (not (memq it suggest-functions)))
                 ;; Don't allow callable objects (interpreted or
                 ;; byte-compiled function objects).
-                (functionp it))
+                (and (not (symbolp it)) (functionp it)))
                args))))
 
 (defun suggest--safe-p (fn args)
