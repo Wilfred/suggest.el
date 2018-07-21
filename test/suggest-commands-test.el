@@ -50,7 +50,9 @@ FORM must use _ for the user's input."
                   (format _))
   ;; Regression test.
   (should-suggest '(a b c d) 'c => 2
-                  (-elem-index _)))
+                  (-elem-index _))
+  (should-suggest 4 => '(1 2 3 4)
+                  (number-sequence _)))
 
 (ert-deftest suggest-higher-order-fns ()
   "We should not call higher order functions with symbols that
