@@ -376,48 +376,51 @@ This plist associates functions with particular arguments that
 produce good results. If a function isn't explicitly mentioned,
 we look up `t' instead.")
 
-(defun suggest--safe (fn args)
-  "Is FN safe to call with ARGS?
+(defun suggest--unsafe-p (fn args)
+  "Is FN unsafe to call with ARGS?
 
 Safety here means that we:
 
 * don't have any side effects, and
 * don't crash Emacs."
-  (not
-   (or
-    ;; Due to Emacs bug #25684, string functions that call
-    ;; caseify_object in casefiddle.c cause Emacs to segfault when
-    ;; given negative integers.
-    (and (memq fn '(upcase downcase capitalize upcase-initials))
-         (consp args)
-         (null (cdr args))
-         (integerp (car args))
-         (< (car args) 0))
-    ;; If `read' is called with nil or t, it prompts interactively.
-    (and (eq fn 'read)
-         (member args '(nil (nil) (t))))
-    ;; Work around https://github.com/Wilfred/suggest.el/issues/37 on
-    ;; Emacs 24, where it's possible to crash `read' with a list.
-    (and (eq fn 'read)
-         (eq emacs-major-version 24)
-         (consp (car args)))
-    ;; Work around https://github.com/magnars/dash.el/issues/241
-    (and (memq fn '(-interleave -zip))
-         (null args))
-    (and (memq fn suggest-funcall-functions) ;
-         ;; TODO: what about circular lists?
-         ;;
-         ;; Does apply even handle that nicely? It looks like apply
-         ;; tries to get the length of the list and hangs until C-g.
-         (format-proper-list-p args)
-         (--any (or
-                 ;; Don't call any higher order functions with symbols that
-                 ;; aren't known to be safe.
-                 (and (symbolp it) (not (memq it suggest-functions)))
-                 ;; Don't allow callable objects (interpreted or
-                 ;; byte-compiled function objects).
-                 (functionp it))
-                args)))))
+  (or
+   ;; Due to Emacs bug #25684, string functions that call
+   ;; caseify_object in casefiddle.c cause Emacs to segfault when
+   ;; given negative integers.
+   (and (memq fn '(upcase downcase capitalize upcase-initials))
+        (consp args)
+        (null (cdr args))
+        (integerp (car args))
+        (< (car args) 0))
+   ;; If `read' is called with nil or t, it prompts interactively.
+   (and (eq fn 'read)
+        (member args '(nil (nil) (t))))
+   ;; Work around https://github.com/Wilfred/suggest.el/issues/37 on
+   ;; Emacs 24, where it's possible to crash `read' with a list.
+   (and (eq fn 'read)
+        (eq emacs-major-version 24)
+        (consp (car args)))
+   ;; Work around https://github.com/magnars/dash.el/issues/241
+   (and (memq fn '(-interleave -zip))
+        (null args))
+   (and (memq fn suggest-funcall-functions) ;
+        ;; TODO: what about circular lists?
+        ;;
+        ;; Does apply even handle that nicely? It looks like apply
+        ;; tries to get the length of the list and hangs until C-g.
+        (format-proper-list-p args)
+        (--any (or
+                ;; Don't call any higher order functions with symbols that
+                ;; aren't known to be safe.
+                (and (symbolp it) (not (memq it suggest-functions)))
+                ;; Don't allow callable objects (interpreted or
+                ;; byte-compiled function objects).
+                (functionp it))
+               args))))
+
+(defun suggest--safe-p (fn args)
+  "Is FN safe to call with ARGS?"
+  (not (suggest--unsafe-p fn args)))
 
 (defface suggest-heading
   '((((class color) (background light)) :foreground "DarkGoldenrod4" :weight bold)
@@ -686,9 +689,9 @@ tend to be progressively more silly.")
   "Call FUNC with VALUES, ignoring all errors.
 If FUNC returns a value, return a plist (:output ...). Returns
 nil otherwise."
-  (when (suggest--safe func (if variadic-p
-                                (car values)
-                              values))
+  (when (suggest--safe-p func (if variadic-p
+                                  (car values)
+                                values))
     (let ((default-directory "/")
           (file-name-handler-alist nil)
           func-output func-success)
