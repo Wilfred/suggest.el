@@ -534,7 +534,7 @@ and outputs given."
 N counts from 1."
   (goto-char (point-min))
   (let ((headings-seen 0))
-    (loop-while (< headings-seen n)
+    (while (< headings-seen n)
       (when (suggest--on-heading-p)
         (cl-incf headings-seen))
       (forward-line 1)))
