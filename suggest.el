@@ -335,6 +335,7 @@ consider these, but only with arguments that are known to be safe." )
    #'-cons* '(nil)
    #'-snoc '(nil)
    #'append '(nil)
+   #'vector '(nil)
    ;; `format' has specific formatting strings that are worth trying.
    #'format '("%d" "%o" "%x" "%X" "%e" "%c" "%f" "%s" "%S")
    ;; `-iterate' is great for building incrementing/decrementing lists.
