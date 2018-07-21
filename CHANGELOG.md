@@ -6,6 +6,12 @@ Added vector function `vector`.
 
 Added formatting function `prin1-to-string`.
 
+Added string functions `string-prefix-p`, `string-suffix-p`,
+`string-remove-prefix` and `string-remove-suffix`,
+
+Added many more type predicates, such as `arrayp` and `floatp`. Also
+added some arithmetic predicates, such as `natnump`.
+
 # v0.6
 
 **Critical**: Fixed an issue where suggest.el would call symbols given
