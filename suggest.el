@@ -889,26 +889,27 @@ than their values."
   (setq suggest--spinner (spinner-create 'progress-bar t))
   (spinner-start suggest--spinner)
 
-  ;; TODO: error on multiple inputs on one line.
-  (let* ((raw-inputs (suggest--raw-inputs))
-         (inputs (--map (suggest--read-eval it) raw-inputs))
-         (raw-output (suggest--raw-output))
-         (desired-output (suggest--read-eval raw-output))
-         (possibilities
-          (suggest--possibilities raw-inputs inputs desired-output)))
-    ;; Sort, and take the top 5 most relevant results.
-    (setq possibilities
-          (-take 5
-                 (-sort #'suggest--cmp-relevance possibilities)))
+  (unwind-protect
+      ;; TODO: error on multiple inputs on one line.
+      (let* ((raw-inputs (suggest--raw-inputs))
+             (inputs (--map (suggest--read-eval it) raw-inputs))
+             (raw-output (suggest--raw-output))
+             (desired-output (suggest--read-eval raw-output))
+             (possibilities
+              (suggest--possibilities raw-inputs inputs desired-output)))
+        ;; Sort, and take the top 5 most relevant results.
+        (setq possibilities
+              (-take 5
+                     (-sort #'suggest--cmp-relevance possibilities)))
 
-    (if possibilities
-        (suggest--write-suggestions
-         possibilities
-         ;; We show the evalled output, not the raw input, so if
-         ;; users use variables, we show the value of that variable.
-         desired-output)
-      (suggest--write-suggestions-string ";; No matches found.")))
-  (setq suggest--spinner nil)
+        (if possibilities
+            (suggest--write-suggestions
+             possibilities
+             ;; We show the evalled output, not the raw input, so if
+             ;; users use variables, we show the value of that variable.
+             desired-output)
+          (suggest--write-suggestions-string ";; No matches found.")))
+    (setq suggest--spinner nil))
   (suggest--update-needed nil)
   (set-buffer-modified-p nil))
 
