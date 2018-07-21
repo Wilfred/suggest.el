@@ -12,6 +12,8 @@ Added string functions `string-prefix-p`, `string-suffix-p`,
 Added many more type predicates, such as `arrayp` and `floatp`. Also
 added some arithmetic predicates, such as `natnump`.
 
+Added a spinner so users don't think we've hung during searching.
+
 # v0.6
 
 **Critical**: Fixed an issue where suggest.el would call symbols given

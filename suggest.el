@@ -5,7 +5,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.7
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "24.4") (loop "1.3") (dash "2.13.0") (s "1.11.0") (f "0.18.2"))
+;; Package-Requires: ((emacs "24.4") (loop "1.3") (dash "2.13.0") (s "1.11.0") (f "0.18.2") (spinner "1.7.3"))
 ;; URL: https://github.com/Wilfred/suggest.el
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,7 @@
 (require 'loop)
 (require 's)
 (require 'f)
+(require 'spinner)
 (require 'subr-x)
 (require 'cl-extra) ;; cl-prettyprint
 (require 'cl-lib) ;; cl-incf, cl-evenp, cl-oddp
@@ -776,6 +777,9 @@ than their values."
       (dotimes (iteration suggest--search-depth)
         (catch 'done-iteration
           (dolist (func funcs)
+            ;; We need to call redisplay so the spinner keeps rotating
+            ;; as we search.
+            (redisplay)
             (loop-for-each item this-iteration
               (let ((literals (plist-get item :literals))
                     (values (plist-get item :values))
@@ -875,10 +879,15 @@ than their values."
      (t
       (< (length (plist-get pos1 :funcs)) (length (plist-get pos2 :funcs)))))))
 
+(defvar suggest--spinner nil)
+
 ;;;###autoload
 (defun suggest-update ()
   "Update the suggestions according to the latest inputs/output given."
   (interactive)
+  (setq suggest--spinner (spinner-create 'progress-bar t))
+  (spinner-start suggest--spinner)
+
   ;; TODO: error on multiple inputs on one line.
   (let* ((raw-inputs (suggest--raw-inputs))
          (inputs (--map (suggest--read-eval it) raw-inputs))
@@ -898,10 +907,12 @@ than their values."
          ;; users use variables, we show the value of that variable.
          desired-output)
       (suggest--write-suggestions-string ";; No matches found.")))
+  (setq suggest--spinner nil)
   (suggest--update-needed nil)
   (set-buffer-modified-p nil))
 
-(define-derived-mode suggest-mode emacs-lisp-mode "Suggest"
+(define-derived-mode suggest-mode emacs-lisp-mode
+  '("Suggest" (:eval (spinner-print suggest--spinner)))
   "A major mode for finding functions that provide the output requested.")
 
 (define-key suggest-mode-map (kbd "C-c C-c") #'suggest-update)
