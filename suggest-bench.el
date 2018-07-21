@@ -37,8 +37,7 @@
   (interactive)
   ;; Overall call time.
   (suggest--print-time
-   (suggest))
-  )
+   (suggest)))
 
 (provide 'suggest-bench)
 ;; suggest-bench.el ends here

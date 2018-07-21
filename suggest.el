@@ -723,7 +723,7 @@ This is primarily for quoting symbols."
    (t
     (format "%S" value))))
 
-(defun suggest--try-call (iteration func input-values input-literals)
+(defsubst suggest--try-call (iteration func input-values input-literals)
   "Try to call FUNC with INPUT-VALUES, and return a list of outputs"
   (let (outputs)
     ;; See if (func value1 value2...) gives us a value.
