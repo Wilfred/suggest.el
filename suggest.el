@@ -779,11 +779,11 @@ than their values."
                             (suggest--permutations input-literals)))))
     (catch 'done
       (dotimes (iteration suggest--search-depth)
+        ;; We need to call redisplay so the spinner keeps rotating
+        ;; as we search.
+        (redisplay)
         (catch 'done-iteration
           (dolist (func funcs)
-            ;; We need to call redisplay so the spinner keeps rotating
-            ;; as we search.
-            (redisplay)
             (loop-for-each item this-iteration
               (let ((literals (plist-get item :literals))
                     (values (plist-get item :values))
