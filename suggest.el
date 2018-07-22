@@ -753,6 +753,21 @@ This is primarily for quoting symbols."
     ;; (+ 1 2) over (+ 0 1 2).
     (nreverse outputs)))
 
+(defmacro suggest--dolist-catch (var-val-tag &rest body)
+  "Loop over a list, terminating early if TAG is thrown.
+Evaluate BODY with VAR bound to each car from LIST, in turn.
+
+\(fn (VAR LIST TAG) BODY...)"
+  (declare (indent 1) (debug ((symbolp form &optional form) body)))
+  (unless (consp var-val-tag)
+    (signal 'wrong-type-argument (list 'consp var-val-tag)))
+  (unless (= (length var-val-tag) 3)
+    (signal 'wrong-number-of-arguments (list 3 (length var-val-tag))))
+  (-let [(var val tag) var-val-tag]
+    `(catch ,tag
+       (dolist (,var ,val)
+         ,@body))))
+
 (defun suggest--possibilities (input-literals input-values output)
   "Return a list of possibilities for these INPUTS-VALUES and OUTPUT.
 Each possbility form uses INPUT-LITERALS so we show variables rather
@@ -782,55 +797,53 @@ than their values."
         ;; We need to call redisplay so the spinner keeps rotating
         ;; as we search.
         (redisplay)
-        (catch 'done-iteration
-          (dolist (func funcs)
-            (loop-for-each item this-iteration
-              (let ((literals (plist-get item :literals))
-                    (values (plist-get item :values))
-                    (funcs (plist-get item :funcs)))
-                ;; Try to call the function, then classify its return values.
-                (dolist (func-result (suggest--try-call iteration func values literals))
-                  (let ((func-output (plist-get func-result :output)))
-                    (cl-case (suggest--classify-output values func-output output)
-                      ;; The function gave us the output we wanted, just save it.
-                      ('match
+        (suggest--dolist-catch (func funcs 'done-iteration)
+          (suggest--dolist-catch (item this-iteration 'done-func)
+            (let ((literals (plist-get item :literals))
+                  (values (plist-get item :values))
+                  (funcs (plist-get item :funcs)))
+              ;; Try to call the function, then classify its return values.
+              (dolist (func-result (suggest--try-call iteration func values literals))
+                (let ((func-output (plist-get func-result :output)))
+                  (cl-case (suggest--classify-output values func-output output)
+                    ;; The function gave us the output we wanted, just save it.
+                    ('match
+                     (push
+                      (list :funcs (cons (list :sym func
+                                               :variadic-p (plist-get func-result :variadic-p))
+                                         funcs)
+                            :literals (plist-get func-result :literals))
+                      possibilities)
+                     (cl-incf possibilities-count)
+                     (when (>= possibilities-count suggest--max-possibilities)
+                       (throw 'done nil))
+
+                     ;; If we're on the first iteration, we're just
+                     ;; searching all input permutations. Don't try any
+                     ;; other permutations, or we end up showing e.g. both
+                     ;; (+ 2 3) and (+ 3 2).
+                     (when (zerop iteration)
+                       (throw 'done-func nil)))
+                    ;; The function returned a different result to what
+                    ;; we wanted. Build a list of these values so we
+                    ;; can explore them.
+                    ('different
+                     (when (and
+                            (< intermediates-count suggest--max-intermediates)
+                            (< (gethash func-output value-occurrences 0)
+                               suggest--max-per-value))
+                       (puthash
+                        func-output
+                        (1+ (gethash func-output value-occurrences 0))
+                        value-occurrences)
+                       (cl-incf intermediates-count)
                        (push
                         (list :funcs (cons (list :sym func
-                                                 :variadic-p (plist-get func-result :variadic-p))
+                                                 :variadic-p (plist-get output :variadic-p))
                                            funcs)
-                              :literals (plist-get func-result :literals))
-                        possibilities)
-                       (cl-incf possibilities-count)
-                       (when (>= possibilities-count suggest--max-possibilities)
-                         (throw 'done nil))
-
-                       ;; If we're on the first iteration, we're just
-                       ;; searching all input permutations. Don't try any
-                       ;; other permutations, or we end up showing e.g. both
-                       ;; (+ 2 3) and (+ 3 2).
-                       (when (zerop iteration)
-                         ;; TODO: (throw 'done-func nil)
-                         (loop-break)))
-                      ;; The function returned a different result to what
-                      ;; we wanted. Build a list of these values so we
-                      ;; can explore them.
-                      ('different
-                       (when  (and
-                               (< intermediates-count suggest--max-intermediates)
-                               (< (gethash func-output value-occurrences 0)
-                                  suggest--max-per-value))
-                         (puthash
-                          func-output
-                          (1+ (gethash func-output value-occurrences 0))
-                          value-occurrences)
-                         (cl-incf intermediates-count)
-                         (push
-                          (list :funcs (cons (list :sym func
-                                                   :variadic-p (plist-get output :variadic-p))
-                                             funcs)
-                                :literals (plist-get func-result :literals)
-                                :values (list func-output))
-                          intermediates))))))))))
+                              :literals (plist-get func-result :literals)
+                              :values (list func-output))
+                        intermediates)))))))))
 
         (setq this-iteration intermediates)
         (setq intermediates nil)
