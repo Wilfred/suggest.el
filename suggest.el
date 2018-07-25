@@ -558,7 +558,7 @@ N counts from 1."
 
 (defun suggest--format-output (value)
   "Format VALUE as the output to a function."
-  (let* ((lines (s-lines (suggest--pretty-format value)))
+  (let* ((lines (s-lines (s-trim (pp-to-string value))))
          (prefixed-lines
           (--map-indexed
            (if (zerop it-index) (concat ";=> " it) (concat ";   " it))
@@ -604,26 +604,6 @@ SUGGESTIONS is a list of forms."
        (--map (suggest--format-suggestion it output))
        (s-join "\n")
        (suggest--write-suggestions-string)))
-
-;; TODO: this is largely duplicated with refine.el and should be
-;; factored out somewhere.
-(defun suggest--pretty-format (value)
-  "Return a pretty-printed version of VALUE."
-  (let ((cl-formatted (with-temp-buffer
-                        (cl-prettyprint value)
-                        (s-trim (buffer-string)))))
-    (cond ((stringp value)
-           ;; TODO: we should format newlines as \n
-           (format "\"%s\"" value))
-          ;; Print nil and t as-is.'
-          ((or (eq t value) (eq nil value))
-           (format "%s" value))
-          ;; Display other symbols, and lists, with a quote, so we
-          ;; show usable syntax.
-          ((or (symbolp value) (consp value))
-           (format "'%s" cl-formatted))
-          (t
-           cl-formatted))))
 
 (defun suggest--read-eval (form)
   "Read and eval FORM, but don't open a debugger on errors."
