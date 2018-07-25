@@ -360,6 +360,9 @@ consider these, but only with arguments that are known to be safe." )
    #'-is-suffix-p '()
    #'-is-prefix-p '()
    #'-is-infix-p '()
+   ;; Joining strings is commonly done with spaces or newlines.
+   #'string-join '("\n" " ")            ; default is "" already.
+   #'s-join '("" "\n" " ")
    ;; Remove has some weird behaviours with t: (remove 'foo t) => t.
    ;; Only use nil as an extra value, so we can discover remove as an
    ;; alternative to `-non-nil'.
@@ -701,7 +704,7 @@ This is primarily for quoting symbols."
      (not (eq value t)))
     (format "'%s" value))
    (t
-    (format "%S" value))))
+    (s-trim (pp-to-string value)))))
 
 (defsubst suggest--try-call (iteration func input-values input-literals)
   "Try to call FUNC with INPUT-VALUES, and return a list of outputs"

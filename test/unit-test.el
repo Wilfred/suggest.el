@@ -19,4 +19,5 @@
   (should (equal (suggest--unread :foo) ":foo"))
   (should (equal (suggest--unread 42) "42"))
   (should (equal (suggest--unread "foo") "\"foo\""))
+  (should (equal (suggest--unread "\n") "\"\\n\""))
   (should (equal (suggest--unread '1+) "#'1+")))
