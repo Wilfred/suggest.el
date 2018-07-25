@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'dash)
+(require 'seq)
 (require 'loop)
 (require 's)
 (require 'f)
@@ -61,6 +62,9 @@
    #'sequencep
    #'stringp
    #'symbolp
+   ;; Sequence predicates
+   #'seq-set-equal-p
+   #'seq-empty-p
    ;; Built-in functions that access or examine lists.
    #'car
    #'cdr
@@ -84,6 +88,18 @@
    ;; Sequence functions
    #'elt
    #'aref
+   #'seq-subseq
+   #'seq-drop
+   #'seq-take
+   #'seq-sort
+   #'seq-reverse
+   #'seq-concatenate
+   #'seq-into
+   #'seq-position
+   #'seq-uniq
+   #'seq-partition
+   #'seq-intersection
+   #'seq-difference
    ;; CL list functions.
    #'cl-first
    #'cl-second
@@ -343,6 +359,10 @@ consider these, but only with arguments that are known to be safe." )
    #'-iterate '(1+ 1-)
    ;; Lists can be sorted in a variety of ways.
    #'-sort '(< > string< string>)
+   #'seq-sort '(< > string< string>)
+   ;; Sequences of type.
+   #'seq-concatenate '(vector string list)
+   #'seq-into '(vector string list)
    ;; For indexing functions, just use non-negative numbers. This
    ;; avoids confusing results like (last nil 5) => nil.
    #'elt '(0 1 2)

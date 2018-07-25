@@ -1,5 +1,7 @@
 # v0.8
 
+Added sequence functions from seq.el.
+
 Fixed an issue where higher-order functions weren't always suggested.
 
 # v0.7
