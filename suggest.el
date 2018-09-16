@@ -688,7 +688,11 @@ tend to be progressively more silly.")
 (defsubst suggest--classify-output (inputs func-output target-output)
   "Classify FUNC-OUTPUT so we can decide whether we should keep it."
   (cond
-   ((equal func-output target-output)
+   ((or
+     (and (numberp func-output)
+          (numberp target-output)
+          (= func-output target-output))
+     (equal func-output target-output))
     'match)
    ;; If the function gave us nil, we're not going to
    ;; find any interesting values by further exploring

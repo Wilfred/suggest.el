@@ -1,5 +1,8 @@
 # v0.8
 
+Numeric function outputs are now compared with `=`, so `1.0` and `1`
+are considered equal when finding candidates.
+
 Improved formatting of outputs. If you request an output of `#x10`, we
 now show `;=> #x10` in the output rather than `;=> 16`. This is
 particularly useful for characters, which are the same type as
