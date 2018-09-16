@@ -1,35 +1,15 @@
 (require 'ert)
 (require 'suggest)
 
-(ert-deftest suggest-format-t ()
+(ert-deftest suggest--join-func-output ()
   (should
    (equal
-    (suggest--pretty-format t) "t")))
-
-(ert-deftest suggest-format-symbol ()
+    (suggest--join-func-output "(foo)" "1")
+    "(foo) ;=> 1"))
   (should
    (equal
-    (suggest--pretty-format 'x) "'x")))
-
-(ert-deftest suggest-format-string ()
-  (should
-   (equal
-    (suggest--pretty-format "bar") "\"bar\"")))
-
-(ert-deftest suggest-format-string-list ()
-  (should
-   (equal
-    (suggest--pretty-format '("foo")) "'(\"foo\")")))
-
-(ert-deftest suggest-format-output-symbol ()
-  (should
-   (equal
-    (suggest--format-output 'foo) ";=> 'foo")))
-
-(ert-deftest suggest-format-output-multiline ()
-  (should
-   (equal
-    (suggest--format-output "foo\nbar") ";=> \"foo\n;   bar\"")))
+    (suggest--join-func-output "(foo)" "(1\n 2)")
+    "(foo) ;=> (1\n      ;    2)")))
 
 (ert-deftest suggest-cmp ()
   (let ((add-constant '(:funcs ((:sym + :variadic-p nil))
