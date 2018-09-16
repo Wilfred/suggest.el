@@ -579,18 +579,41 @@ N counts from 1."
       ;; Insert the text, ensuring it can't be edited.
       (insert (propertize text 'read-only t)))))
 
-(defun suggest--format-output (value)
-  "Format VALUE as the output to a function."
-  (let* ((lines (s-lines (s-trim (pp-to-string value))))
-         (prefixed-lines
+(defun suggest--join-func-output (formatted-call formatted-value)
+  "Combine strings FORMATTED-CALL and FORMATTED-VALUE and indent."
+  (let* ((prefixed-lines
+          ;; Put a ;=> before FORMATTED-VALUE.
           (--map-indexed
            (if (zerop it-index) (concat ";=> " it) (concat ";   " it))
-           lines)))
-    (s-join "\n" prefixed-lines)))
+           (s-lines formatted-value)))
+         ;; A string of spaces the same length as FORMATTED-CALL.
+         (matching-spaces (s-repeat (length formatted-call) " "))
+         ;; If FORMATTED-VALUE is a multiline string, indent
+         ;; subsequent lines.
+         (formatted-lines
+          (--map-indexed
+           (if (zerop it-index)
+               (format "%s %s" formatted-call it)
+             (format "%s %s" matching-spaces it))
+           prefixed-lines)))
+    (s-join "\n" formatted-lines)))
 
-(defun suggest--format-suggestion (suggestion output)
-  "Format SUGGESTION as a lisp expression returning OUTPUT."
-  (let ((formatted-call ""))
+(defun suggest--format-suggestion (suggestion raw-output)
+  "Format SUGGESTION as a lisp expression returning RAW-OUTPUT.
+RAW-OUTPUT is a string, so we can distinguish literals,
+e.g. decimal 16 from hex #x10."
+  (let* ((formatted-call "")
+         (func-output (plist-get suggestion :output))
+         (desired-output (read raw-output))
+         (formatted-output
+          (if (and (numberp desired-output)
+                   (eq (type-of desired-output) (type-of func-output)))
+              ;; If the user typed a number literal #x10, and we
+              ;; didn't change type (e.g. 1.0 vs 1), we want to show
+              ;; the same literal in the output.
+              raw-output
+            ;; Otherwise, show the actual function output.
+            (pp-to-string func-output))))
     ;; Build up a string "(func1 (func2 ... literal-inputs))"
     (let ((funcs (plist-get suggestion :funcs))
           (literals (plist-get suggestion :literals)))
@@ -607,31 +630,27 @@ N counts from 1."
                     (s-join " " literals)))
       (setq formatted-call
             (concat formatted-call (s-repeat (length funcs) ")"))))
-    (let* (;; A string of spaces the same length as the suggestion.
-           (matching-spaces (s-repeat (length formatted-call) " "))
-           (formatted-output (suggest--format-output output))
-           ;; Append the output to the formatted suggestion. If the
-           ;; output runs over multiple lines, indent appropriately.
-           (formatted-lines
-            (--map-indexed
-             (if (zerop it-index)
-                 (format "%s %s" formatted-call it)
-               (format "%s %s" matching-spaces it))
-             (s-lines formatted-output))))
-      (s-join "\n" formatted-lines))))
+    (suggest--join-func-output formatted-call formatted-output)))
 
-(defun suggest--write-suggestions (suggestions output)
+(defun suggest--write-suggestions (suggestions raw-output)
   "Write SUGGESTIONS to the current *suggest* buffer.
 SUGGESTIONS is a list of forms."
   (->> suggestions
-       (--map (suggest--format-suggestion it output))
+       (--map (suggest--format-suggestion it raw-output))
        (s-join "\n")
        (suggest--write-suggestions-string)))
 
-(defun suggest--read-eval (form)
-  "Read and eval FORM, but don't open a debugger on errors."
+(defun suggest--read (form)
+  "Read FORM, but don't open a debugger on errors."
   (condition-case err
-      (eval (read form))
+      (read form)
+    (error (user-error
+            "Could not parse %s: %s" form err))))
+
+(defun suggest--eval (form)
+  "Eval FORM, but don't open a debugger on errors."
+  (condition-case err
+      (eval form)
     (error (user-error
             "Could not eval %s: %s" form err))))
 
@@ -815,7 +834,8 @@ than their values."
                       (list :funcs (cons (list :sym func
                                                :variadic-p (plist-get func-result :variadic-p))
                                          funcs)
-                            :literals (plist-get func-result :literals))
+                            :literals (plist-get func-result :literals)
+                            :output func-output)
                       possibilities)
                      (cl-incf possibilities-count)
                      (when (>= possibilities-count suggest--max-possibilities)
@@ -851,12 +871,7 @@ than their values."
         (setq this-iteration intermediates)
         (setq intermediates nil)
         (setq intermediates-count 0)))
-    ;; Return a plist of just :funcs and :literals, which is all we
-    ;; need to render the result.
-    (-map (lambda (res)
-            (list :funcs (plist-get res :funcs)
-                  :literals (plist-get res :literals)))
-          possibilities)))
+    possibilities))
 
 (defun suggest--cmp-relevance (pos1 pos2)
   "Compare two possibilities such that the more relevant result
@@ -911,9 +926,9 @@ than their values."
   (unwind-protect
       ;; TODO: error on multiple inputs on one line.
       (let* ((raw-inputs (suggest--raw-inputs))
-             (inputs (--map (suggest--read-eval it) raw-inputs))
+             (inputs (--map (suggest--eval (suggest--read it)) raw-inputs))
              (raw-output (suggest--raw-output))
-             (desired-output (suggest--read-eval raw-output))
+             (desired-output (suggest--eval (suggest--read raw-output)))
              (possibilities
               (suggest--possibilities raw-inputs inputs desired-output)))
         ;; Sort, and take the top 5 most relevant results.
@@ -922,11 +937,7 @@ than their values."
                      (-sort #'suggest--cmp-relevance possibilities)))
 
         (if possibilities
-            (suggest--write-suggestions
-             possibilities
-             ;; We show the evalled output, not the raw input, so if
-             ;; users use variables, we show the value of that variable.
-             desired-output)
+            (suggest--write-suggestions possibilities raw-output)
           (suggest--write-suggestions-string ";; No matches found.")))
     (setq suggest--spinner nil))
   (suggest--update-needed nil)

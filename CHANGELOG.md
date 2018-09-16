@@ -1,5 +1,10 @@
 # v0.8
 
+Improved formatting of outputs. If you request an output of `#x10`, we
+now show `;=> #x10` in the output rather than `;=> 16`. This is
+particularly useful for characters, which are the same type as
+integers.
+
 Added sequence functions from seq.el.
 
 Fixed an issue where higher-order functions weren't always suggested.
