@@ -727,7 +727,7 @@ This is primarily for quoting symbols."
     (s-trim (pp-to-string value)))))
 
 (defsubst suggest--try-call (iteration func input-values input-literals)
-  "Try to call FUNC with INPUT-VALUES, and return a list of outputs"
+  "Try to call FUNC with arguments INPUT-VALUES, and return a list of outputs"
   (let (outputs)
     ;; See if (func value1 value2...) gives us a value.
     (-when-let (result (suggest--call func input-values input-literals))
