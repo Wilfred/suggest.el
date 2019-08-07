@@ -175,7 +175,6 @@
    #'max
    #'min
    #'ash
-   #'lsh
    #'log
    #'expt
    #'sqrt
