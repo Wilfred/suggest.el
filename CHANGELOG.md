@@ -74,7 +74,7 @@ Added functions `-reduce`, `-reduce-r` and `-iterate`.
 
 # v0.4
 
-The search algorithm is now smarter at avoiding previoiusly-seen
+The search algorithm is now smarter at avoiding previously-seen
 values, resulting in a larger search space being explored. You may see
 additional suggestions.
 
