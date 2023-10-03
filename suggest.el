@@ -430,7 +430,7 @@ Safety here means that we:
         ;;
         ;; Does apply even handle that nicely? It looks like apply
         ;; tries to get the length of the list and hangs until C-g.
-        (format-proper-list-p args)
+        (proper-list-p args)
         (--any (or
                 ;; Don't call any higher order functions with symbols that
                 ;; aren't known to be safe.
