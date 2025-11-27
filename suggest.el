@@ -210,6 +210,7 @@
    #'capitalize
    #'replace-regexp-in-string
    #'format
+   #'string-trim
    #'string-join
    #'string-prefix-p
    #'string-suffix-p
@@ -271,6 +272,8 @@
    #'file-name-directory
    #'file-name-nondirectory
    #'file-name-extension
+   #'file-name-sans-extension
+   #'file-relative-name
    #'expand-file-name
    #'abbreviate-file-name
    #'directory-file-name
