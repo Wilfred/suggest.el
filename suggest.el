@@ -832,7 +832,7 @@ than their values."
                 (let ((func-output (plist-get func-result :output)))
                   (cl-case (suggest--classify-output values func-output output)
                     ;; The function gave us the output we wanted, just save it.
-                    ('match
+                    (match
                      (push
                       (list :funcs (cons (list :sym func
                                                :variadic-p (plist-get func-result :variadic-p))
@@ -853,7 +853,7 @@ than their values."
                     ;; The function returned a different result to what
                     ;; we wanted. Build a list of these values so we
                     ;; can explore them.
-                    ('different
+                    (different
                      (when (and
                             (< intermediates-count suggest--max-intermediates)
                             (< (gethash func-output value-occurrences 0)
